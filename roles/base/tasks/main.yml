@@ -1,0 +1,421 @@
+---
+
+  - name: ensure /indicee exists
+    file: state=directory path=/indicee
+
+  - name: ensure /indicee/bin exists
+    file: path=/indicee/bin state=directory
+
+  - name: ensure /indicee/svc exists
+    file: path=/indicee/svc state=directory
+
+  - name: ensure /indicee/log exists
+    file: path=/indicee/log state=directory
+
+  - name: install python-apt
+    raw: "apt-get install -y python-apt"
+
+  - name: update apt cache
+    apt: update-cache=yes
+
+  - name: install acpid
+    apt: pkg=acpid state=present
+
+  - name: install acpi
+    apt: pkg=acpi state=present
+
+  - name: install aptitude
+    apt: pkg=aptitude state=present
+
+  - name: install at
+    apt: pkg=at state=present
+
+  - name: install bc
+    apt: pkg=bc state=present
+
+  - name: install bsd-mailx
+    apt: pkg=bsd-mailx state=present
+
+  - name: install bzip2
+    apt: pkg=bzip2 state=present
+
+  - name: install curl
+    apt: pkg=curl state=present
+
+  - name: install daemontools
+    apt: pkg=daemontools state=present
+
+  - name: install daemontools-run
+    apt: pkg=daemontools-run state=present
+
+  - name: install dbus
+    apt: pkg=dbus state=present
+
+  - name: install dc
+    apt: pkg=dc state=present
+
+  - name: install gawk
+    apt: pkg=gawk state=present
+
+  - name: install git
+    apt: pkg=git state=present
+
+  - name: install heirloom-mailx
+    apt: pkg=heirloom-mailx state=present
+
+  - name: install imagemagick
+    apt: pkg=imagemagick state=present
+
+  - name: install iotop
+    apt: pkg=iotop state=present
+
+  - name: install jed
+    apt: pkg=jed state=present
+
+  - name: install jed-common
+    apt: pkg=jed-common state=present
+
+  - name: install libaio1
+    apt: pkg=libaio1 state=present
+
+  - name: install libc6-i386
+    apt: pkg=libc6-i386 state=present
+
+  - name: install libcache-perl
+    apt: pkg=libcache-perl state=present
+
+  - name: install libcairo2
+    apt: pkg=libcairo2 state=present
+
+  - name: install libcdt4
+    apt: pkg=libcdt4 state=present
+
+  - name: install libcroco3
+    apt: pkg=libcroco3 state=present
+
+  - name: install libcups2
+    apt: pkg=libcups2 state=present
+
+  - name: install libcupsimage2
+    apt: pkg=libcupsimage2 state=present
+
+  - name: install libcurl3-gnutls
+    apt: pkg=libcurl3-gnutls state=present
+
+  - name: install libcurl3
+    apt: pkg=libcurl3 state=present
+
+  - name: install libdatrie1
+    apt: pkg=libdatrie1 state=present
+
+  - name: install libdbi-perl
+    apt: pkg=libdbi-perl state=present
+
+  - name: install libdbus-1-3
+    apt: pkg=libdbus-1-3 state=present
+
+  - name: install libdigest-sha1-perl
+    apt: pkg=libdigest-sha1-perl state=present
+
+  - name: install libdjvulibre21
+    apt: pkg=libdjvulibre21 state=present
+
+  - name: install libdjvulibre-text
+    apt: pkg=libdjvulibre-text state=present
+
+  - name: install liberror-perl
+    apt: pkg=liberror-perl state=present
+
+  - name: install libexiv2-9
+    apt: pkg=libexiv2-9 state=present
+
+  - name: install libfontconfig1
+    apt: pkg=libfontconfig1 state=present
+
+  - name: install libfontenc1
+    apt: pkg=libfontenc1 state=present
+
+  - name: install libfont-freetype-perl
+    apt: pkg=libfont-freetype-perl state=present
+
+  - name: install libgd2-noxpm
+    apt: pkg=libgd2-noxpm state=present
+
+  - name: install libglib2.0-0
+    apt: pkg=libglib2.0-0 state=present
+
+  - name: install libglib2.0-data
+    apt: pkg=libglib2.0-data state=present
+
+  - name: install libgomp1
+    apt: pkg=libgomp1 state=present
+
+  - name: install libgpgme11
+    apt: pkg=libgpgme11 state=present
+
+  - name: install libgraph4
+    apt: pkg=libgraph4 state=present
+
+  - name: install libgs8
+    apt: pkg=libgs8 state=present
+
+  - name: install libgsf-1-114
+    apt: pkg=libgsf-1-114 state=present
+
+  - name: install libgsf-1-common
+    apt: pkg=libgsf-1-common state=present
+
+  - name: install libgtk2.0-0
+    apt: pkg=libgtk2.0-0 state=present
+
+  - name: install libgtk2.0-bin
+    apt: pkg=libgtk2.0-bin state=present
+
+  - name: install libgtk2.0-common
+    apt: pkg=libgtk2.0-common state=present
+
+  - name: install libgvc5
+    apt: pkg=libgvc5 state=present
+
+  - name: install libice6
+    apt: pkg=libice6 state=present
+
+  - name: install libilmbase6
+    apt: pkg=libilmbase6 state=present
+
+  - name: install libaio-multiplex-perl
+    apt: pkg=libaio-multiplex-perl state=present
+
+  - name: install libipc-sharelite-perl
+    apt: pkg=libipc-sharelite-perl state=present
+
+  - name: install libjasper1
+    apt: pkg=libjasper1 state=present
+
+  - name: install libjbig2dec0
+    apt: pkg=libjbig2dec0 state=present
+
+  - name: install libjpeg62
+    apt: pkg=libjpeg62 state=present
+
+  - name: install liblcms1
+    apt: pkg=liblcms1 state=present
+
+  - name: install liblqr-1-0
+    apt: pkg=liblqr-1-0 state=present
+
+  - name: install libltdl7
+    apt: pkg=libltdl7 state=present
+
+  - name: install libmagickcore3-extra
+    apt: pkg=libmagickcore3-extra state=present
+
+  - name: install libmagickcore3
+    apt: pkg=libmagickcore3 state=present
+
+  - name: install libmagickwand3
+    apt: pkg=libmagickwand3 state=present
+
+  - name: install libnet-cidr-perl
+    apt: pkg=libnet-cidr-perl state=present
+
+  - name: install libnet-daemon-perl
+    apt: pkg=libnet-daemon-perl state=present
+
+  - name: install libnetpbm10
+    apt: pkg=libnetpbm10 state=present
+
+  - name: install libnet-server-perl
+    apt: pkg=libnet-server-perl state=present
+
+  - name: install libnet-snmp-perl
+    apt: pkg=libnet-snmp-perl state=present
+
+  - name: install libonig2
+    apt: pkg=libonig2 state=present
+
+  - name: install libopenexr6
+    apt: pkg=libopenexr6 state=present
+
+  - name: install libopts25
+    apt: pkg=libopts25 state=present
+
+  - name: install libpango1.0-0
+    apt: pkg=libpango1.0-0 state=present
+
+  - name: install libpango1.0-common
+    apt: pkg=libpango1.0-common state=present
+
+  - name: install libpaper1
+    apt: pkg=libpaper1 state=present
+
+  - name: install libpaper-utils
+    apt: pkg=libpaper-utils state=present
+
+  - name: install libpathplan4
+    apt: pkg=libpathplan4 state=present
+
+  - name: install libpcap0.8
+    apt: pkg=libpcap0.8 state=present
+
+  - name: install libpixman-1-0
+    apt: pkg=libpixman-1-0 state=present
+
+  - name: install libplrpc-perl
+    apt: pkg=libplrpc-perl state=present
+
+  - name: install libpng12-0
+    apt: pkg=libpng12-0 state=present
+
+  - name: install librsvg2-2
+    apt: pkg=librsvg2-2 state=present
+
+  - name: install libslang2-modules
+    apt: pkg=libslang2-modules state=present
+
+  - name: install libsm6
+    apt: pkg=libsm6 state=present
+
+  - name: install libssh2-1
+    apt: pkg=libssh2-1 state=present
+
+  - name: install libthai0
+    apt: pkg=libthai0 state=present
+
+  - name: install libthai-data
+    apt: pkg=libthai-data state=present
+
+  - name: install libtiff4
+    apt: pkg=libtiff4 state=present
+
+  - name: install libwmf0.2-7
+    apt: pkg=libwmf0.2-7 state=present
+
+  - name: install libxcb-render0
+    apt: pkg=libxcb-render0 state=present
+
+  - name: install libxcb-render-util0
+    apt: pkg=libxcb-render-util0 state=present
+
+  - name: install libxcomposite1
+    apt: pkg=libxcomposite1 state=present
+
+  - name: install libxcursor1
+    apt: pkg=libxcursor1 state=present
+
+  - name: install libxdamage1
+    apt: pkg=libxdamage1 state=present
+
+  - name: install libxdot4
+    apt: pkg=libxdot4 state=present
+
+  - name: install libxfixes3
+    apt: pkg=libxfixes3 state=present
+
+  - name: install libxfont1
+    apt: pkg=libxfont1 state=present
+
+  - name: install libxft2
+    apt: pkg=libxft2 state=present
+
+  - name: install libxi6
+    apt: pkg=libxi6 state=present
+
+  - name: install libxinerama1
+    apt: pkg=libxinerama1 state=present
+
+  - name: install libxrandr2
+    apt: pkg=libxrandr2 state=present
+
+  - name: install libxrender1
+    apt: pkg=libxrender1 state=present
+
+  - name: install libxt6
+    apt: pkg=libxt6 state=present
+
+  - name: install munin-common
+    apt: pkg=munin-common state=present
+
+  - name: install munin-node
+    apt: pkg=munin-node state=present
+
+  - name: install munin-plugins-extra
+    apt: pkg=munin-plugins-extra state=present
+
+  - name: install netcat-openbsd
+    apt: pkg=netcat-openbsd state=present
+
+  - name: install netpbm
+    apt: pkg=netpbm state=present
+
+  - name: install nload
+    apt: pkg=nload state=present
+
+  - name: install ntp
+    apt: pkg=ntp state=present
+
+  - name: install python-apt-common
+    apt: pkg=python-apt-common state=present
+
+  - name: install python-apt
+    apt: pkg=python-apt state=present
+
+  - name: install python-central
+    apt: pkg=python-central state=present
+
+  - name: install python-configobj
+    apt: pkg=python-configobj state=present
+
+  - name: install python-psutil
+    apt: pkg=python-psutil state=present
+
+  - name: install rsync
+    apt: pkg=rsync state=present
+
+  - name: install screen
+    apt: pkg=screen state=present
+
+  - name: install shared-mime-info
+    apt: pkg=shared-mime-info state=present
+
+  - name: install slsh
+    apt: pkg=slsh state=present
+
+  - name: install ssh
+    apt: pkg=ssh state=present
+
+  - name: install sudo
+    apt: pkg=sudo state=present
+
+  - name: install tcpdump
+    apt: pkg=tcpdump state=present
+
+  - name: install ttf-dejavu-core
+    apt: pkg=ttf-dejavu-core state=present
+
+  - name: install ufraw-batch
+    apt: pkg=ufraw-batch state=present
+
+  - name: install unzip
+    apt: pkg=unzip state=present
+
+  - name: install vim
+    apt: pkg=vim state=present
+
+  - name: install vim-runtime
+    apt: pkg=vim-runtime state=present
+
+  - name: install x11-common
+    apt: pkg=x11-common state=present
+
+  - name: install xfonts-encodings
+    apt: pkg=xfonts-encodings state=present
+
+  - name: install xfonts-utils
+    apt: pkg=xfonts-utils state=present
+
+  - name: install xttcidfond-conf
+    apt: pkg=xttcidfond-conf state=present
+
+  - name: install zip
+    apt: pkg=zip state=present

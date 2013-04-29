@@ -1,0 +1,39 @@
+#!/bin/bash
+# Setup the necessary variables
+JBOSS_HOME=/indicee/jboss
+JAVA_HOME=/indicee/java/jdk
+JBOSS_USER=root
+export total_ram=$(free -m | grep Mem | awk {'print $2'})
+[ -z "$MAX_RAM" ] && export max_ram=$((45 * total_ram / 100))
+BOOTLOG="/indicee/log/jboss-boot.log"
+JAVA_OPTS="-server \
+   -XX:+UseCompressedOops \
+   -XX:+TieredCompilation \
+   -Djboss.http.port=80 \
+   -Djboss.https.port=443 \
+   -Djboss.bind.address=0.0.0.0 \
+   -Xms${max_ram}m \
+   -Xmx${max_ram}m \
+   -XX:ReservedCodeCacheSize=128m \
+   -XX:MaxPermSize=384m \
+   -Dorg.jboss.resolver.warning=true \
+   -Dfile.encoding=UTF-8 \
+   -Dsun.rmi.dgc.client.gcInterval=3600000 \
+   -Dsun.rmi.dgc.server.gcInterval=3600000 \
+   -Dcom.indicee.imp.cube.cache.folder=/cache \
+   -Djboss.server.log.dir=/indicee/log/ \
+   -Dorg.jboss.boot.log.file=$BOOTLOG \
+   -Dlogging.configuration=file:/indicee/jboss/standalone/configuration/logging.properties \
+   -Djboss.home.dir=/indicee/jboss \
+   -Dquery.worker.threads=8 \
+   -Dcom.indicee.imp.db.wh.admin.password=symmetrics \
+   -Dcom.indicee.imp.db.wh.server=localhost"
+
+EXEC="${JBOSS_HOME}/bin/standalone.sh"
+export JBOSS_HOME JAVA_HOME JAVA_OPTS 
+
+# Ensure that rm -fr $JBOSS_HOME/standalone/tmp/* is run
+rm -fr $JBOSS_HOME/standalone/tmp/*
+
+exec 2>&1
+exec setuidgid $JBOSS_USER ${EXEC}

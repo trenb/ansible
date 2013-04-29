@@ -1,0 +1,32 @@
+---
+
+  - name: retrieve jboss 7.1.1
+    get_url: url=http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.tar.gz dest=/indicee
+
+  - name: extract jboss 7.1.1
+    command: tar -zxf jboss-as-7.1.1.Final.tar.gz chdir=/indicee
+
+  - name: move jboss install to /indicee/jboss
+    command: mv jboss-as-7.1.1.Final jboss chdir=/indicee creates=/indicee/jboss
+
+  - name: ensure /indicee/jboss/modules/com/mysql/main exists
+    file src=/indicee/jboss/modules/com/mysql/main state=directory
+
+  - name: copy mysqlconnector over
+    copy: src=/home/tren/ansible/roles/jboss/files/mysql-connector-java-5.1.18-bin.jar dest=/indicee/jboss/com/mysql/main
+
+  - name: copy mysqlconnector module.xml files over
+    copy: src=/home/tren/ansible/roles/jboss/files/module.xml dest=/indicee/jboss/com/mysql/main
+
+  - name: symlink /indicee/jboss to /usr/local/jboss7
+    file: src=/indicee/jboss dest=/usr/local/jboss7 state=link
+
+  - name: ensure /indicee/svc/jboss/log exists
+    file: src=/indicee/svc/jboss/log state=directory
+
+  - name: copy the run file for jboss
+    copy: src=/home/tren/ansible/roles/jboss/files/jboss.run dest=/indicee/svc/jboss/run mode=755
+
+  - name: copy the run file for the jboss log process
+    copy: src=/home/tren/ansible/roles/jboss/files/jboss.log.run dest=/indicee/svc/jboss/log/run mode=755
+  
