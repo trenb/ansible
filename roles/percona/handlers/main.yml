@@ -1,3 +1,9 @@
 ---
+  - name: start percona
+    action: service name=mysql state=started enabled=yes
+
   - name: restart percona
     action: service name=mysql state=restarted enabled=yes
+
+  - name: stop percona
+    action: service name=mysql state=stopped enabled=yes

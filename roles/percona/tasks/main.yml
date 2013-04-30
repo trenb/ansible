@@ -39,12 +39,9 @@
     apt: pkg=percona-xtradb-cluster-server-5.5 state=present
 
   - name: install the my.cnf
-    copy: src=my.cnf dest=/etc/mysql/my.cnf
-
-  - name: install debian.cnf
-    copy: src=debian.cnf dest=/etc/mysql/debian.cnf
+    copy: src=my.cnf dest=/etc/mysql/my.cnf mode=0644
 
   - name: install base percona files
     command: /usr/bin/mysql_install_db creates=/indicee/mysql-data/db/mysql
     notify:
-      - restart percona
+      - start percona
