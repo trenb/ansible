@@ -1,0 +1,37 @@
+---
+
+  - name: ensure that /indicee/phoenix exists
+    file: src=/indicee/phoenix state=directory
+
+  - name: ensure that /indicee/phoenix is symlinked to /usr/local/synergy
+    file: src=/indicee/phoenix dest=/usr/local/synergy state=link
+
+  - name: transfer over symmetrics-2.5.6.169.0.tren.v2.tgz
+    copy: src=symmetrics-2.5.6.169.0.tren.v2.tgz dest=/tmp/symmetrics-2.5.6.169.0.tren.v2.tgz mode=0640
+
+  - name: extract package
+    command: tar -zxf symmetrics-2.5.6.169.0.tren.v2.tgz chdir=/tmp creates=/tmp/installer
+
+  - name: copy install_schema.sh
+    copy: src=install_schema.sh dest=/tmp/installer/install_schema.sh mode=0750
+
+  - name: install the ondemand schema
+    command: install_schema.sh creates=/indicess/mysql-data/db/eclipse_app chdir=/tmp/installer
+
+  - name: stop jboss
+    command: svc -d /etc/service/jboss && killall $(pgrep java) 
+
+  - name: ensure the hosts file has the proper entries
+    lineinfile: dest=/etc/hosts regexp='^127\.0\.0\.1' line='127.0.0.1 localhost nvision.symmetrics chief.indicee foreman.indicee hornetq1.indicee master.indicee database.indicee staging.dbs.indicee eclipse.dbs.indicee quartz.dbs.indicee cache.dbs.indicee headnode1.indicee secure.indicee worker1.indicee' owner=root group=root mode=0644 state=present
+
+  - name: copy install_ondemand.sh
+    copy: src=install_ondemand.sh dest=/tmp/install/install_ondemand.sh mode=0750
+
+  - name: perform the schema upgrade and install the ondemand application
+    command: install_ondemand.sh chdir=/tmp/installer creates=/indicee/jboss/standalone/deployments/synergy.ear
+
+  - name: copy over quartz.properties
+    copy: src=quartz.properties dest=/indicee/jboss/quartz.properties
+
+  - name: start jboss
+    command: svc -u /etc/service/jboss
