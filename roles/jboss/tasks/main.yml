@@ -13,10 +13,10 @@
     file src=/indicee/jboss/modules/com/mysql/main state=directory
 
   - name: copy mysqlconnector over
-    copy: src=/home/tren/ansible/roles/jboss/files/mysql-connector-java-5.1.18-bin.jar dest=/indicee/jboss/com/mysql/main
+    copy: src=mysql-connector-java-5.1.18-bin.jar dest=/indicee/jboss/com/mysql/main
 
   - name: copy mysqlconnector module.xml files over
-    copy: src=/home/tren/ansible/roles/jboss/files/module.xml dest=/indicee/jboss/com/mysql/main
+    copy: src=module.xml dest=/indicee/jboss/com/mysql/main
 
   - name: symlink /indicee/jboss to /usr/local/jboss7
     file: src=/indicee/jboss dest=/usr/local/jboss7 state=link
@@ -25,8 +25,8 @@
     file: src=/indicee/svc/jboss/log state=directory
 
   - name: copy the run file for jboss
-    copy: src=/home/tren/ansible/roles/jboss/files/jboss.run dest=/indicee/svc/jboss/run mode=755
+    copy: src=jboss.run dest=/indicee/svc/jboss/run mode=755
 
   - name: copy the run file for the jboss log process
-    copy: src=/home/tren/ansible/roles/jboss/files/jboss.log.run dest=/indicee/svc/jboss/log/run mode=755
+    copy: src=jboss.log.run dest=/indicee/svc/jboss/log/run mode=755
   

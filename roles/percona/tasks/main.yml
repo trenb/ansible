@@ -9,7 +9,7 @@
     file: state=directory path=/indicee/mysql-data/log owner=mysql group=mysql mode=2770
     
   - name: put add_percona_repo
-    copy: src=/home/tren/bin/add_percona_repo dest=/tmp/add_percona_repo mode=0755 
+    copy: src=add_percona_repo dest=/tmp/add_percona_repo mode=0755 
 
   - name: add percona repository
     command: add_percona_repo chdir=/tmp creates=/tmp/add_percona_repo
@@ -39,10 +39,10 @@
     apt: pkg=percona-xtradb-cluster-server-5.5 state=present
 
   - name: install the my.cnf
-    copy: src=/home/tren/ansible/files/percona/my.cnf dest=/etc/mysql/my.cnf
+    copy: src=my.cnf dest=/etc/mysql/my.cnf
 
   - name: install debian.cnf
-    copy: src=/home/tren/ansible/files/percona/debian.cnf dest=/etc/mysql/debian.cnf
+    copy: src=debian.cnf dest=/etc/mysql/debian.cnf
 
   - name: install base percona files
     command: /usr/bin/mysql_install_db creates=/indicee/mysql-data/db/mysql
