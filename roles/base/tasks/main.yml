@@ -18,110 +18,40 @@
   - name: update apt cache
     apt: update-cache=yes
 
-  - name: install bzip2
-    apt: pkg=bzip2 state=present
-
-  - name: install curl
-    apt: pkg=curl state=present
-
-  - name: install daemontools
-    apt: pkg=daemontools state=present
-
-  - name: install daemontools-run
-    apt: pkg=daemontools-run state=present
-
-  - name: install dbus
-    apt: pkg=dbus state=present
-
-  - name: install gawk
-    apt: pkg=gawk state=present
-
-  - name: install git
-    apt: pkg=git state=present
-
-  - name: install heirloom-mailx
-    apt: pkg=heirloom-mailx state=present
-
-  - name: install imagemagick
-    apt: pkg=imagemagick state=present
-
-  - name: install iotop
-    apt: pkg=iotop state=present
-
-  - name: install jed
-    apt: pkg=jed state=present
-
-  - name: install libaio1
-    apt: pkg=libaio1 state=present
-
-  - name: install libcache-perl
-    apt: pkg=libcache-perl state=present
-
-  - name: install libdbi-perl
-    apt: pkg=libdbi-perl state=present
-
-  - name: install libio-multiplex-perl
-    apt: pkg=libio-multiplex-perl state=present
-
-  - name: install libipc-sharelite-perl
-    apt: pkg=libipc-sharelite-perl state=present
-
-  - name: install libnet-cidr-perl
-    apt: pkg=libnet-cidr-perl state=present
-
-  - name: install libnet-server-perl
-    apt: pkg=libnet-server-perl state=present
-
-  - name: install libnet-snmp-perl
-    apt: pkg=libnet-snmp-perl state=present
-
-  - name: install libopts25
-    apt: pkg=libopts25 state=present
-
-  - name: install libpcap0.8
-    apt: pkg=libpcap0.8 state=present
-
-  - name: install munin-common
-    apt: pkg=munin-common state=present
-
-  - name: install munin-node
-    apt: pkg=munin-node state=present
-
-  - name: install munin-plugins-extra
-    apt: pkg=munin-plugins-extra state=present
-
-  - name: install netcat-openbsd
-    apt: pkg=netcat-openbsd state=present
-
-  - name: install nload
-    apt: pkg=nload state=present
-
-  - name: install ntp
-    apt: pkg=ntp state=present
-
-  - name: install python-configobj
-    apt: pkg=python-configobj state=present
-
-  - name: install python-psutil
-    apt: pkg=python-psutil state=present
-
-  - name: install screen
-    apt: pkg=screen state=present
-
-  - name: install ssh
-    apt: pkg=ssh state=present
-
-  - name: install sudo
-    apt: pkg=sudo state=present
-
-  - name: install tcpdump
-    apt: pkg=tcpdump state=present
-
-  - name: install unzip
-    apt: pkg=unzip state=present
-
-  - name: install vim
-    apt: pkg=vim state=present
-
-  - name: install zip
-    apt: pkg=zip state=present
+  - name: installing base packages
+    apt: pkg={{ item }} state=present
+    with_items:
+      - curl
+      - daemontools
+      - daemontools-run
+      - dbus
+      - gawk
+      - git
+      - heirloom-mailx
+      - imagemagick
+      - iotop
+      - jed
+      - libaio1
+      - libcache-perl
+      - libdbi-perl
+      - libio-multiplex-perl
+      - libipc-sharelite-perl
+      - libnet-cidr-perl
+      - libnet-snmp-perl
+      - libopts25
+      - libpcap0.8
+      - munin-common
+      - munin-node
+      - munin-plugins-extra
+      - netcat-openbsd
+      - nload
+      - ntp
+      - python-configobj
+      - python-psutil
+      - screen
+      - ssh
+      - sudo
+      - tcpdump
+      - unzip
+      - vim
+      - zip
