@@ -1,7 +1,6 @@
 ---
-
   - name: ensure that /indicee/phoenix exists
-    file: src=/indicee/phoenix state=directory
+    file: path=/indicee/phoenix state=directory
 
   - name: ensure that /indicee/phoenix is symlinked to /usr/local/synergy
     file: src=/indicee/phoenix dest=/usr/local/synergy state=link
@@ -16,7 +15,7 @@
     copy: src=install_schema.sh dest=/tmp/installer/install_schema.sh mode=0750
 
   - name: install the ondemand schema
-    command: install_schema.sh creates=/indicess/mysql-data/db/eclipse_app chdir=/tmp/installer
+    command: /tmp/installer/install_schema.sh creates=/indicess/mysql-data/db/eclipse_app chdir=/tmp/installer
 
   - name: stop jboss
     command: svc -d /etc/service/jboss && killall $(pgrep java) 
@@ -25,13 +24,39 @@
     lineinfile: dest=/etc/hosts regexp='^127\.0\.0\.1' line='127.0.0.1 localhost nvision.symmetrics chief.indicee foreman.indicee hornetq1.indicee master.indicee database.indicee staging.dbs.indicee eclipse.dbs.indicee quartz.dbs.indicee cache.dbs.indicee headnode1.indicee secure.indicee worker1.indicee' owner=root group=root mode=0644 state=present
 
   - name: copy install_ondemand.sh
-    copy: src=install_ondemand.sh dest=/tmp/install/install_ondemand.sh mode=0750
+    copy: src=install_ondemand.sh dest=/tmp/installer/install_ondemand.sh mode=0750
 
   - name: perform the schema upgrade and install the ondemand application
-    command: install_ondemand.sh chdir=/tmp/installer creates=/indicee/jboss/standalone/deployments/synergy.ear
+    command: /tmp/installer/install_ondemand.sh chdir=/tmp/installer creates=/indicee/jboss/standalone/deployments/synergy.ear
+
+  - name: copy phantomjs over
+    copy: src=phantomjs-1.6.1-indicee.tar.gz dest=/tmp
+
+  - name: extract phantomjs
+    command: tar -zxf /tmp/phantomjs-1.6.1-indicee.tar.gz -C /usr/local creates=/usr/local/phantomjs
+
+  - name: link /usr/local/phantomjs-1.6.1-linux-x86_64-dynamic to /usr/local/phantomjs
+    file: src=/usr/local/phantomjs-1.6.1-linux-x86_64-dynamic dest=/usr/local/phantomjs state=link
+
+  - name: link /usr/local/phantomjs/bin/phantomjs to /usr/bin/phantomjs
+    file: src=/usr/local/phantomjs/bin/phantomjs dest=/usr/bin/phantomjs state=link
+
+  - name: link /usr/local/phantomjs/lib/$item to /usr/lib
+    file: src=/usr/local/phantomjs/lib/$item dest=/usr/lib/$item state=link
+    with_items:
+      - libQtCore.so.4
+      - libQtGui.so.4
+      - libQtNetwork.so.4
+      - libQtWebKit.so.4
 
   - name: copy over quartz.properties
     copy: src=quartz.properties dest=/indicee/jboss/quartz.properties
 
-  - name: start jboss
-    command: svc -u /etc/service/jboss
+  - name: copy ondemand.cnf to /etc/mysql
+    command: cp /tmp/installer/ondemand.cnf /etc/mysql/ondemand.cnf creates=/etc/mysql/ondemand.cnf
+
+  - name: symlink ondemand.cnf to debian.cnf
+    command: ln -sf /etc/mysql/ondemand.cnf /etc/mysql/debian.cnf
+
+#  - name: start jboss
+#    command: svc -u /etc/service/jboss

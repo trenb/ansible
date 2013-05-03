@@ -3,25 +3,28 @@
     get_url: url=http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.tar.gz dest=/indicee
 
   - name: extract jboss 7.1.1
-    command: tar -zxf jboss-as-7.1.1.Final.tar.gz chdir=/indicee
+    command: tar -zxf jboss-as-7.1.1.Final.tar.gz chdir=/indicee creates=/indicee/jboss
 
   - name: move jboss install to /indicee/jboss
     command: mv jboss-as-7.1.1.Final jboss chdir=/indicee creates=/indicee/jboss
 
   - name: ensure /indicee/jboss/modules/com/mysql/main exists
-    file src=/indicee/jboss/modules/com/mysql/main state=directory
+    file: path=/indicee/jboss/modules/com/mysql/main state=directory
 
   - name: copy mysqlconnector over
-    copy: src=mysql-connector-java-5.1.18-bin.jar dest=/indicee/jboss/com/mysql/main
+    copy: src=mysql-connector-java-5.1.18-bin.jar dest=/indicee/jboss/modules/com/mysql/main
 
   - name: copy mysqlconnector module.xml files over
-    copy: src=module.xml dest=/indicee/jboss/com/mysql/main
+    copy: src=module.xml dest=/indicee/jboss/modules/com/mysql/main
 
   - name: symlink /indicee/jboss to /usr/local/jboss7
     file: src=/indicee/jboss dest=/usr/local/jboss7 state=link
 
   - name: ensure /indicee/svc/jboss/log exists
-    file: src=/indicee/svc/jboss/log state=directory
+    file: path=/indicee/svc/jboss/log state=directory
+
+  - name: ensure /indicee/log/svc/jboss exists
+    file: path=/indicee/log/svc/jboss state=directory
 
   - name: copy the run file for jboss
     copy: src=jboss.run dest=/indicee/svc/jboss/run mode=755
