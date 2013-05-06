@@ -19,3 +19,6 @@ if [[ -d /indicee/mysql-data/db/imp_cache ]]
 then
   mysql --defaults-file=/tmp/installer/ondemand.cnf -uroot -e "drop database imp_cache;"
 fi
+
+# Patch the database to fix Symmetrics #801
+mysql --defaults-file=/tmp/installer/ondemand.cnf -uroot -e 'use eclipse_app;update configuration set value="443" where name="indicee.server.port";'
