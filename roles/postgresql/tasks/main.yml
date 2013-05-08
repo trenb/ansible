@@ -11,6 +11,9 @@
   - name: install postgresql-9.2
     apt: pkg=postgresql-9.2 state=present
 
+  - name: install postgresql-9.2 contrib extensions
+    apt: pkg=postgresql-contrib-9.2 state=present
+
   - name: stop postgresql-9.2
     command: /etc/init.d/postgresql stop
 
