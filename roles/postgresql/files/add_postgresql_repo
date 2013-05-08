@@ -1,0 +1,10 @@
+#!/bin/bash
+# Helper script to determine if Postgresql repo is present in /etc/apt/sources.list
+SOURCES=/etc/apt/sources.list
+grep -qi postgresql $SOURCES
+if [[ $? -ne 0 ]]
+then
+  echo -e "\n# Postgresql repo\ndeb http://apt.postgresql.org/pub/repos/apt/ squeeze-pgdg main\n" >> $SOURCES
+# Add the postgresql keys
+  wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | apt-key add -
+fi

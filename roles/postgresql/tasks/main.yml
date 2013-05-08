@@ -1,0 +1,29 @@
+---
+  - name: put add_postgresql_repo
+    copy: src=add_postgresql_repo dest=/tmp/add_postgresql_repo mode=0755 
+
+  - name: add postgresql repository
+    command: /tmp/add_postgresql_repo
+
+  - name: update apt cache
+    apt: update-cache=yes
+
+  - name: install postgresql-9.2
+    apt: pkg=postgresql-9.2 state=present
+
+  - name: stop postgresql-9.2
+    command: /etc/init.d/postgresql stop
+
+  - name: install the postgresql.conf
+    copy: src=postgresql.conf dest=/etc/postgresql/9.2/main/postgresql.conf mode=0644 owner=postgres group=postgres mode=0644
+
+  - name: ensure /indicee/postgresql-data/9.2 exists
+    file: state=directory path=/indicee/postgresql-data/9.2 owner=postgres group=postgres mode=2770
+
+  - name: ensure postgresql db log directory exists
+    file: state=directory path=/indicee/postgresql-data/log owner=postgres group=postgres mode=2770
+    
+  - name: move /var/lib/postgresql/9.2/main to /indicee/postgresql-data/9.2/main
+    command: mv /var/lib/postgresql/9.2/main /indicee/postgresql-data/9.2/main creates=/indicee/postgresql-data/9.2/main
+    notify:
+      - start postgresql
