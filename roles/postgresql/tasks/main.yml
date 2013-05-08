@@ -14,6 +14,9 @@
   - name: stop postgresql-9.2
     command: /etc/init.d/postgresql stop
 
+  - name: update shmmax sysctl parameter
+    sysctl: name=kernel.shmmax value=40000000 state=present
+
   - name: install the postgresql.conf
     copy: src=postgresql.conf dest=/etc/postgresql/9.2/main/postgresql.conf mode=0644 owner=postgres group=postgres mode=0644
 
