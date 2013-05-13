@@ -1,0 +1,50 @@
+---
+  - name: installing base packages for graphite
+    apt: pkg={{ item }} state=present
+    with_items:
+      - python-pip
+      - python-cairo
+      - python-django
+      - python-django-tagging
+      - python-twisted
+      - python-memcache
+      - python-pysqlite2
+      - python-simplejson
+
+  - name: update pip
+    command: pip install --upgrade pip
+
+  - name: installing graphite via pip
+    pip: name={{ item }}
+    with_items:
+      - whisper
+      - carbon
+      - graphite-web
+
+  - name: moving graphite install to /indicee
+    command: mv /opt/graphite /indicee/ creates=/indicee/graphite
+
+  - name: link /indicee/graphite back to /opt
+    file: src=/indicee/graphite dest=/opt/graphite state=link
+
+  - name: copy configuration files to /indicee/graphite/conf
+    copy: src={{ item }} dest=/indicee/graphite/conf/{{ item }} mode=0644
+    with_items:
+      - carbon.conf
+      - storage-aggregation.conf
+      - storage-schemas.conf
+
+  - name: ensure /indicee/svc/carbon/log exists
+    file: path=/indicee/svc/carbon/log state=directory
+
+  - name: ensure /indicee/log/svc/carbon exists
+    file: path=/indicee/log/svc/carbon state=directory
+
+  - name: copy carbon service run file
+    copy: src=carbon.run dest=/indicee/svc/carbon/run mode=0755
+
+  - name: copy carbon log service run file
+    copy: src=carbon.log.run dest=/indicee/svc/carbon/log/run mode=0755
+
+  - name: startup carbon service
+    file: src=/indicee/svc/carbon dest=/etc/service/carbon state=link

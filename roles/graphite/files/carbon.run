@@ -1,0 +1,3 @@
+#!/bin/bash
+cd /indicee/graphite/
+exec /usr/bin/python bin/carbon-cache.py --debug start
