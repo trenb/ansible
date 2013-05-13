@@ -41,8 +41,8 @@
   - name: link /usr/local/phantomjs/bin/phantomjs to /usr/bin/phantomjs
     file: src=/usr/local/phantomjs/bin/phantomjs dest=/usr/bin/phantomjs state=link
 
-  - name: link /usr/local/phantomjs/lib/$item to /usr/lib
-    file: src=/usr/local/phantomjs/lib/$item dest=/usr/lib/$item state=link
+  - name: link phantomjs libraries to /usr/lib
+    file: src=/usr/local/phantomjs/lib/{{ item }} dest=/usr/lib/{{ item }} state=link
     with_items:
       - libQtCore.so.4
       - libQtGui.so.4
