@@ -1,17 +1,4 @@
 ---
-
-  - name: ensure /indicee exists
-    file: state=directory path=/indicee
-
-  - name: ensure /indicee/bin exists
-    file: path=/indicee/bin state=directory
-
-  - name: ensure /indicee/svc exists
-    file: path=/indicee/svc state=directory
-
-  - name: ensure /indicee/log exists
-    file: path=/indicee/log state=directory
-
   - name: install python-apt
     raw: "apt-get install -y python-apt"
 
@@ -21,6 +8,7 @@
   - name: installing base packages
     apt: pkg={{ item }} state=present
     with_items:
+      - bzip2
       - curl
       - daemontools
       - daemontools-run
@@ -55,3 +43,39 @@
       - unzip
       - vim
       - zip
+
+  - name: send custom kernel to remote server
+    copy: src=linux-3.4.46 dest=/boot/linux-3.4.46 mode=0644
+
+  - name: send custom kernel modules to remote server
+    copy: src=linux-3.4.46-modules.tar.bz2 dest=/tmp/linux-3.4.46-modules.tar.bz2 mode=0644
+
+  - name: send grub.cfg to remote server
+    copy: src=grub.cfg dest=/boot/grub/grub.cfg mode=0644
+
+  - name: send zfs-util package to remote server
+    copy: src=zfs_0.6.1-2_amd64.deb dest=/tmp/zfs_0.6.1-2_amd64.deb mode=0644
+
+  - name: extract kernel moduless
+    command: tar -jxf /tmp/linux-3.4.46-modules.tar.bz2 -C /lib/modules chdir=/lib/modules creates=/lib/modules/3.4.46
+
+  - name: install zfs-util package
+    command: dpkg -i /tmp/zfs_0.6.1-2_amd64.deb creates=/etc/init.d/zfs 
+
+  - name: reboot remote node to pick up new kernel
+    command: shutdown -r now
+
+  - name: wait for machine to come back
+    local_action: wait_for host={{ inventory_hostname }} port=22 delay=15 timeout=300
+
+  - name: create indicee pool
+    command: zpool create indicee /dev/sda5 creates=/indicee
+
+  - name: create /indicee/log file system with compression
+    zfs: name=indicee/log compression=on atime=off state=present
+
+  - name: ensure /indicee/bin exists
+    file: path=/indicee/bin state=directory
+
+  - name: ensure /indicee/svc exists
+    file: path=/indicee/svc state=directory

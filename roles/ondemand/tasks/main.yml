@@ -1,6 +1,9 @@
 ---
   - name: ensure that /indicee/phoenix exists
     file: path=/indicee/phoenix state=directory
+  
+  - name: create /indicee/phoenix/repository
+    zfs: name=indicee/repository compression=on atime=off mountpoint=/indicee/phoenix/repository state=present
 
   - name: ensure that /indicee/phoenix is symlinked to /usr/local/synergy
     file: src=/indicee/phoenix dest=/usr/local/synergy state=link
@@ -18,7 +21,7 @@
     command: /tmp/installer/install_schema.sh creates=/indicess/mysql-data/db/eclipse_app chdir=/tmp/installer
 
   - name: stop jboss
-    command: svc -d /etc/service/jboss && killall $(pgrep java) 
+    command: svc -d /etc/service/jboss && killall java 
 
   - name: ensure the hosts file has the proper entries
     lineinfile: dest=/etc/hosts regexp='^127\.0\.0\.1' line='127.0.0.1 localhost nvision.symmetrics chief.indicee foreman.indicee hornetq1.indicee master.indicee database.indicee staging.dbs.indicee eclipse.dbs.indicee quartz.dbs.indicee cache.dbs.indicee headnode1.indicee secure.indicee worker1.indicee' owner=root group=root mode=0644 state=present
@@ -58,5 +61,5 @@
   - name: symlink ondemand.cnf to debian.cnf
     command: ln -sf /etc/mysql/ondemand.cnf /etc/mysql/debian.cnf
 
-#  - name: start jboss
-#    command: svc -u /etc/service/jboss
+  - name: start jboss
+    command: svc -u /etc/service/jboss
