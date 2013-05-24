@@ -22,6 +22,7 @@
       - libaio1
       - libcache-perl
       - libdbi-perl
+      - libicu44
       - libio-multiplex-perl
       - libipc-sharelite-perl
       - libnet-cidr-perl
@@ -56,23 +57,67 @@
   - name: send zfs-util package to remote server
     copy: src=zfs_0.6.1-2_amd64.deb dest=/tmp/zfs_0.6.1-2_amd64.deb mode=0644
 
+  - name: send gptfdisk_0.8.6-1_amd64.deb package to remote server
+    copy: src=gptfdisk_0.8.6-1_amd64.deb dest=/tmp/gptfdisk_0.8.6-1_amd64.deb mode=0644
+
   - name: extract kernel moduless
     command: tar -jxf /tmp/linux-3.4.46-modules.tar.bz2 -C /lib/modules chdir=/lib/modules creates=/lib/modules/3.4.46
 
   - name: install zfs-util package
     command: dpkg -i /tmp/zfs_0.6.1-2_amd64.deb creates=/etc/init.d/zfs 
 
+  - name: install gptfdisk package
+    command: dpkg -i /tmp/gptfdisk_0.8.6-1_amd64.deb creates=/usr/sbin/sgdisk
+
   - name: reboot remote node to pick up new kernel
     command: shutdown -r now
+
+  - name: change hostname to be OnDemand
+    lineinfile: dest=/etc/hostname regexp=^.* line=OnDemand
+
+  - name: change 127.0.1.1 to be ondemand
+    lineinfile: dest=/etc/hosts regexp=^127\.0\.1\.1 line="127.0.1.1 ondemand"
 
   - name: wait for machine to come back
     local_action: wait_for host={{ inventory_hostname }} port=22 delay=15 timeout=300
 
   - name: create indicee pool
-    command: zpool create indicee /dev/sda5 creates=/indicee
+    command: zpool create -f indicee /dev/sda5 creates=/indicee
 
   - name: create /indicee/log file system with compression
     zfs: name=indicee/log compression=on atime=off state=present
+
+  - name: ensure zfs added to startup
+    command: update-rc.d zfs defaults
+
+  - name: check if /dev/sdb is partitioned
+    shell: grep sdb1 /proc/partitions
+    register: partition
+    ignore_errors: True
+
+  - name: ensure /dev/sdb's partition table is wiped
+    shell: sgdisk -Z /dev/sdb
+    when_failed: $partition
+    
+  - name: partition /dev/sdb
+    shell: sgdisk -n 0:0:-8M -t 1:8300 -g /dev/sdb
+    when_failed: $partition
+
+  - name: check if /dev/sdb1 is mounted
+    shell: grep mysql-data /proc/mounts
+    register: filesystem
+    ignore_errors: True
+
+  - name: format /dev/sdb1 as ext4
+    shell: mkfs.ext4 -L mysql-data -m 0 /dev/sdb1
+    when_failed: $filesystem
+
+  - name: ensure /indicee/mysql-data exists
+    file: path=/indicee/mysql-data state=directory
+
+  - name: mount /dev/sdb1 at /indicee/mysql-data
+    mount: name=/indicee/mysql-data src='LABEL=mysql-data' fstype=ext4 opts='noatime,_netdev' state=mounted
+    when_failed: $filesystem
 
   - name: ensure /indicee/bin exists
     file: path=/indicee/bin state=directory
