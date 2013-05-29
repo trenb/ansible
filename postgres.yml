@@ -1,0 +1,6 @@
+---
+  - hosts: databases
+    user: root
+    roles:
+      - base
+      - postgresql
