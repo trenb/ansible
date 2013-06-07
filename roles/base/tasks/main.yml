@@ -46,10 +46,10 @@
       - zip
 
   - name: send custom kernel to remote server
-    copy: src=linux-3.4.46 dest=/boot/linux-3.4.46 mode=0644
+    copy: src=linux-3.4.47 dest=/boot/linux-3.4.47 mode=0644
 
   - name: send custom kernel modules to remote server
-    copy: src=linux-3.4.46-modules.tar.bz2 dest=/tmp/linux-3.4.46-modules.tar.bz2 mode=0644
+    copy: src=linux-3.4.47-modules.tar.bz2 dest=/tmp/linux-3.4.47-modules.tar.bz2 mode=0644
 
   - name: send grub.cfg to remote server
     copy: src=grub.cfg dest=/boot/grub/grub.cfg mode=0644
@@ -61,7 +61,7 @@
     copy: src=gptfdisk_0.8.6-1_amd64.deb dest=/tmp/gptfdisk_0.8.6-1_amd64.deb mode=0644
 
   - name: extract kernel moduless
-    command: tar -jxf /tmp/linux-3.4.46-modules.tar.bz2 -C /lib/modules chdir=/lib/modules creates=/lib/modules/3.4.46
+    command: tar -jxf /tmp/linux-3.4.47-modules.tar.bz2 -C /lib/modules chdir=/lib/modules creates=/lib/modules/3.4.47
 
   - name: install zfs-util package
     command: dpkg -i /tmp/zfs_0.6.1-2_amd64.deb creates=/etc/init.d/zfs 
@@ -81,11 +81,14 @@
   - name: wait for machine to come back
     local_action: wait_for host={{ inventory_hostname }} port=22 delay=15 timeout=300
 
-  - name: create indicee pool
-    command: zpool create -f indicee /dev/sda5 creates=/indicee
+  - name: ensure /indicee exists
+    file: path=/indicee state=directory
+
+  - name: create zfs pool
+    command: zpool create -f zfs /dev/sda5 creates=/zfs
 
   - name: create /indicee/log file system with compression
-    zfs: name=indicee/log compression=on atime=off state=present
+    zfs: name=zfs/log compression=on atime=off mountpoint=/indicee/log state=present
 
   - name: ensure zfs added to startup
     command: update-rc.d zfs defaults
@@ -116,7 +119,7 @@
     file: path=/indicee/mysql-data state=directory
 
   - name: mount /dev/sdb1 at /indicee/mysql-data
-    mount: name=/indicee/mysql-data src='LABEL=mysql-data' fstype=ext4 opts='noatime,_netdev' state=mounted
+    mount: name=/indicee/mysql-data src='LABEL=mysql-data' fstype=ext4 opts='noatime' state=mounted
     when_failed: $filesystem
 
   - name: ensure /indicee/bin exists

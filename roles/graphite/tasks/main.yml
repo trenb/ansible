@@ -1,50 +1,99 @@
 ---
+  - name: put nginx repo
+    copy: src=add_nginx_repo dest=/tmp/add_nginx_repo mode=0755
+
+  - name: add nginx repo
+    command: /tmp/add_nginx_repo
+
+  - name: update apt cache
+    apt: update-cache=yes
+
   - name: installing base packages for graphite
     apt: pkg={{ item }} state=present
     with_items:
-      - python-pip
+      - python-setuptools
+      - python-dev
+      - supervisor
       - python-cairo
-      - python-django
-      - python-django-tagging
-      - python-twisted
-      - python-memcache
-      - python-pysqlite2
-      - python-simplejson
+      - libgetopt-mixed-perl
+      - libmcrypt4
+      - libssl0.9.8
+      - libxml2-dev
+      - curl
+      - nginx
 
-  - name: update pip
-    command: pip install --upgrade pip
+  - name: stop and remove nginx from init.d
+    shell: service nginx stop;update-rc.d -f nginx remove
 
-  - name: installing graphite via pip
+  - name: install pip
+    easy_install: name=pip
+
+  - name: install uwsgi
+    pip: name=uwsgi
+
+  - name: create /tmp/installation
+    file: path=/tmp/installation state=directory
+
+  - name: download graphite packages manually
+    command: pip install -d /tmp/installation graphite-web==0.9.9 carbon==0.9.9 whisper==0.9.9
+
+  - name: installing supporting packages via pip
     pip: name={{ item }}
     with_items:
-      - whisper
-      - carbon
-      - graphite-web
+      - Django==1.2.7
+      - Twisted==11.0.0
+      - txAMQP==0.5
+      - zope.interface==3.8.0
+      - django-tagging
+
+  - name: install whisper manually
+    shell: cd /tmp/installation; tar -zxf whisper-0.9.9.tar.gz; cd /tmp/installation/whisper-0.9.9; python setup.py install
+
+  - name: install carbon manually
+    shell: cd /tmp/installation; tar -zxf carbon-0.9.9.tar.gz; cd /tmp/installation/carbon-0.9.9; python setup.py install
+
+  - name: install graphite-web manually
+    shell: cd /tmp/installation; tar -zxf graphite-web-0.9.9.tar.gz; cd /tmp/installation/graphite-web-0.9.9; python setup.py install
+
+  - name: remove /opt/graphite/storage/whisper and link to /indicee/graphite/whisper
+    shell: rm -fr /opt/graphite/storage/whisper; mkdir -p /indicee/graphite/whisper; ln -s /indicee/graphite/whisper /opt/graphite/storage/whisper creates=/indicee/graphite/whisper
 
   - name: moving graphite install to /indicee
     command: mv /opt/graphite /indicee/ creates=/indicee/graphite
 
-  - name: link /indicee/graphite back to /opt
-    file: src=/indicee/graphite dest=/opt/graphite state=link
+  - name: copy nginx.conf configuration files to /etc/nginx
+    copy: src=nginx.conf dest=/etc/nginx/nginx.conf mode=0644
 
-  - name: copy configuration files to /indicee/graphite/conf
-    copy: src={{ item }} dest=/indicee/graphite/conf/{{ item }} mode=0644
+  - name: copy nginx default.conf to /etc/nginx/conf.d
+    copy: src=default.conf dest=/etc/nginx/conf.d/default.conf mode=0644
+
+  - name: copy supervisord.conf to /etc/supervisor
+    copy: src=supervisord.conf dest=/etc/supervisor/supervisord.conf mode=0644
+    notify:
+      - restart supervisor
+
+  - name: copy graphite configuration files
+    copy: src={{ item }} dest=/opt/graphite/conf/{{ item }} mode=0644
     with_items:
       - carbon.conf
+      - dashboard.conf
       - storage-aggregation.conf
       - storage-schemas.conf
 
-  - name: ensure /indicee/svc/carbon/log exists
-    file: path=/indicee/svc/carbon/log state=directory
+  - name: copy local_settings.py to /opt/graphite/webapp/graphite
+    copy: src=local_settings.py dest=/opt/graphite/webapp/graphite/local_settings.py mode=0644
 
-  - name: ensure /indicee/log/svc/carbon exists
-    file: path=/indicee/log/svc/carbon state=directory
+  - name: run initial syncdb for the webapp
+    raw: cd /opt/graphite/webapp/graphite; python manage.py syncdb --noinput
 
-  - name: copy carbon service run file
-    copy: src=carbon.run dest=/indicee/svc/carbon/run mode=0755
+  - name: ensuring ownership on /opt/graphite
+    command: chown -R www-data:www-data /opt/graphite
 
-  - name: copy carbon log service run file
-    copy: src=carbon.log.run dest=/indicee/svc/carbon/log/run mode=0755
+  - name: ensuring ownership on /indicee/graphite
+    command: chown -R www-data:www-data /indicee/graphite
 
-  - name: startup carbon service
-    file: src=/indicee/svc/carbon dest=/etc/service/carbon state=link
+  - name: stop the supervisor service
+    command: service supervisor stop
+  
+  - name: start the supervisor service
+    command: service supervisor start

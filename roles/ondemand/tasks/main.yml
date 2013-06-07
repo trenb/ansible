@@ -3,16 +3,16 @@
     file: path=/indicee/phoenix state=directory
   
   - name: create /indicee/phoenix/repository
-    zfs: name=indicee/repository compression=on atime=off mountpoint=/indicee/phoenix/repository state=present
+    zfs: name=zfs/repository compression=on atime=off mountpoint=/indicee/phoenix/repository state=present
 
   - name: ensure that /indicee/phoenix is symlinked to /usr/local/synergy
     file: src=/indicee/phoenix dest=/usr/local/synergy state=link
 
-  - name: transfer over symmetrics-2.5.6.169.0.tren.v3.tgz
-    copy: src=symmetrics-2.5.6.169.0.tren.v3.tgz dest=/tmp/symmetrics-2.5.6.169.0.tren.v3.tgz mode=0640
+  - name: transfer over ondemand.2.5.7.100.0.tgz
+    copy: src=ondemand.2.5.7.100.0.tgz dest=/tmp/ondemand.2.5.7.100.0.tgz mode=0640
 
   - name: extract package
-    command: tar -zxf symmetrics-2.5.6.169.0.tren.v3.tgz chdir=/tmp creates=/tmp/installer
+    command: tar -zxf ondemand.2.5.7.100.0.tgz chdir=/tmp creates=/tmp/installer
 
   - name: copy install_schema.sh
     copy: src=install_schema.sh dest=/tmp/installer/install_schema.sh mode=0750

@@ -1,2 +1,0 @@
-#!/bin/bash
-exec setuidgid root multilog /indicee/log/svc/carbon

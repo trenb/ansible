@@ -22,3 +22,5 @@ fi
 
 # Patch the database to fix Symmetrics #801
 mysql --defaults-file=/tmp/installer/ondemand.cnf -uroot -e 'use eclipse_app;update configuration set value="443" where name="indicee.server.port";'
+# Patch to disable signup tab on login screen re Symmetrics #831
+mysql --defaults-file=/tmp/installer/ondemand.cnf -uroot -e 'use eclipse_app;insert into configuration set name="indicee.signup.enabled", value="false";'
