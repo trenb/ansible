@@ -29,9 +29,6 @@
       - libnet-snmp-perl
       - libopts25
       - libpcap0.8
-      - munin-common
-      - munin-node
-      - munin-plugins-extra
       - netcat-openbsd
       - nload
       - ntp
@@ -52,7 +49,7 @@
     copy: src=linux-3.4.47-modules.tar.bz2 dest=/tmp/linux-3.4.47-modules.tar.bz2 mode=0644
 
   - name: send grub.cfg to remote server
-    copy: src=grub.cfg dest=/boot/grub/grub.cfg mode=0644
+    copy: src=grub_{{ disk_prefix }}.cfg dest=/boot/grub/grub.cfg mode=0644
 
   - name: send zfs-util package to remote server
     copy: src=zfs_0.6.1-2_amd64.deb dest=/tmp/zfs_0.6.1-2_amd64.deb mode=0644
@@ -85,7 +82,7 @@
     file: path=/indicee state=directory
 
   - name: create zfs pool
-    command: zpool create -f zfs /dev/sda5 creates=/zfs
+    command: zpool create -f zfs /dev/{{ disk_prefix }}a5 creates=/zfs
 
   - name: create /indicee/log file system with compression
     zfs: name=zfs/log compression=on atime=off mountpoint=/indicee/log state=present
@@ -94,16 +91,16 @@
     command: update-rc.d zfs defaults
 
   - name: check if /dev/sdb is partitioned
-    shell: grep sdb1 /proc/partitions
+    shell: grep {{ disk_prefix }}b1 /proc/partitions
     register: partition
     ignore_errors: True
 
   - name: ensure /dev/sdb's partition table is wiped
-    shell: sgdisk -Z /dev/sdb
+    shell: sgdisk -Z /dev/{{ disk_prefix }}b
     when_failed: $partition
     
   - name: partition /dev/sdb
-    shell: sgdisk -n 0:0:-8M -t 1:8300 -g /dev/sdb
+    shell: sgdisk -n 0:0:-8M -t 1:8300 -g /dev/{{ disk_prefix }}b
     when_failed: $partition
 
   - name: check if /dev/sdb1 is mounted
@@ -112,7 +109,7 @@
     ignore_errors: True
 
   - name: format /dev/sdb1 as ext4
-    shell: mkfs.ext4 -L mysql-data -m 0 /dev/sdb1
+    shell: mkfs.ext4 -L mysql-data -m 0 /dev/{{ disk_prefix }}b1
     when_failed: $filesystem
 
   - name: ensure /indicee/mysql-data exists
