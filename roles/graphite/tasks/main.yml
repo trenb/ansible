@@ -58,9 +58,6 @@
   - name: remove /opt/graphite/storage/whisper and link to /indicee/graphite/whisper
     shell: rm -fr /opt/graphite/storage/whisper; mkdir -p /indicee/graphite/whisper; ln -s /indicee/graphite/whisper /opt/graphite/storage/whisper creates=/indicee/graphite/whisper
 
-  - name: moving graphite install to /indicee
-    command: mv /opt/graphite /indicee/ creates=/indicee/graphite
-
   - name: copy nginx.conf configuration files to /etc/nginx
     copy: src=nginx.conf dest=/etc/nginx/nginx.conf mode=0644
 

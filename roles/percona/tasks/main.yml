@@ -46,6 +46,3 @@
 
   - name: install percona-xtradb-cluster-server-5.5
     apt: pkg=percona-xtradb-cluster-server-5.5 state=present
-
-  - name: copy updated mysql init script
-    copy: src=mysql dest=/etc/init.d/mysql mode=0755 
