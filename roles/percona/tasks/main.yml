@@ -11,17 +11,17 @@
   - name: install libdbd-mysql-perl
     apt: pkg=libdbd-mysql-perl state=present
 
-  - name: install libmysqlclient18
-    apt: pkg=libmysqlclient18 state=present
+  - name: install libmysqlclient18-dev
+    apt: pkg=libmysqlclient18-dev state=present
 
   - name: install percona-xtrabackup
     apt: pkg=percona-xtrabackup state=present
 
-  - name: install percona-xtradb-cluster-client-5.5
-    apt: pkg=percona-xtradb-cluster-client-5.5 state=present
+  - name: install percona-server-client-5.5
+    apt: pkg=percona-server-client-5.5 state=present
   
   - name: install the my.cnf
-    template: src=my.cnf dest=/etc/mysql/my.cnf mode=0644
+    template: src=my.cnf.j2 dest=/etc/mysql/my.cnf mode=0644
 
   - name: add mysql group
     group: name=mysql gid=115 state=present
@@ -38,11 +38,8 @@
   - name: ensure percona db log directory exists
     file: state=directory path=/indicee/mysql-data/log owner=mysql group=mysql mode=2770
     
-  - name: install percona-xtradb-cluster-common-5.5
-    apt: pkg=percona-xtradb-cluster-common-5.5 state=present
+  - name: install percona-server-common-5.5
+    apt: pkg=percona-server-common-5.5 state=present
 
-  - name: install percona-xtradb-cluster-galera-2.x
-    apt: pkg=percona-xtradb-cluster-galera-2.x state=present
-
-  - name: install percona-xtradb-cluster-server-5.5
-    apt: pkg=percona-xtradb-cluster-server-5.5 state=present
+  - name: install percona-server-server-5.5
+    apt: pkg=percona-server-server-5.5 state=present

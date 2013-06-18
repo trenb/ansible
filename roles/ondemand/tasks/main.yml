@@ -21,7 +21,8 @@
     command: /tmp/installer/install_schema.sh creates=/indicess/mysql-data/db/eclipse_app chdir=/tmp/installer
 
   - name: stop jboss
-    shell: svc -d /etc/service/jboss && killall java 
+    shell: svc -d /etc/service/jboss;killall java 
+    ignore_errors: True
 
   - name: ensure the hosts file has the proper entries
     lineinfile: dest=/etc/hosts regexp='^127\.0\.0\.1' line='127.0.0.1 localhost nvision.symmetrics chief.indicee foreman.indicee hornetq1.indicee master.indicee database.indicee staging.dbs.indicee eclipse.dbs.indicee quartz.dbs.indicee cache.dbs.indicee headnode1.indicee secure.indicee worker1.indicee' owner=root group=root mode=0644 state=present

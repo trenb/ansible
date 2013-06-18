@@ -40,7 +40,7 @@
       - unzip
       - vim
       - zip
-    when_string: $ansible_lsb.codename == 'squeeze'
+    when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
   - name: installing base packages
     apt: pkg={{ item }} state=present
@@ -60,7 +60,7 @@
       - libaio1
       - libcache-perl
       - libdbi-perl
-      - libicu44
+      - libicu48
       - libio-multiplex-perl
       - libipc-sharelite-perl
       - libnet-cidr-perl
@@ -114,7 +114,7 @@
       - ttf-unfonts-core
       - ttf-unfonts-extra
       - ttf-unifont
-    when_string: $ansible_lsb.codename == 'wheezy'
+    when_string: '"wheezy" in "${ansible_lsb.codename}"'
 
   - name: send custom kernel to remote server
     copy: src=linux-{{ kernel_version }} dest=/boot/linux-{{ kernel_version }} mode=0644
@@ -130,7 +130,7 @@
 
   - name: send gptfdisk_0.8.6-1_amd64.deb package to remote server
     copy: src=gptfdisk_0.8.6-1_amd64.deb dest=/tmp/gptfdisk_0.8.6-1_amd64.deb mode=0644
-    when_string: $ansible_lsb.codename == 'squeeze'
+    when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
   - name: extract kernel moduless
     command: tar -jxf /tmp/linux-{{ kernel_version }}-modules.tar.bz2 -C /lib/modules chdir=/lib/modules creates=/lib/modules/{{ kernel_version }}
@@ -140,7 +140,7 @@
 
   - name: install gptfdisk package
     command: dpkg -i /tmp/gptfdisk_0.8.6-1_amd64.deb creates=/usr/sbin/sgdisk
-    when_string: $ansible_lsb.codename == 'squeeze'
+    when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
   - name: reboot remote node to pick up new kernel
     command: shutdown -r now

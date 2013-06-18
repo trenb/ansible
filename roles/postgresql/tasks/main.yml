@@ -1,6 +1,6 @@
 ---
   - name: put add_postgresql_repo
-    template: src=add_postgresql_repo dest=/tmp/add_postgresql_repo mode=0755 
+    template: src=add_postgresql_repo.j2 dest=/tmp/add_postgresql_repo mode=0755 
 
   - name: add postgresql repository
     command: /tmp/add_postgresql_repo
@@ -21,10 +21,10 @@
     sysctl: name=kernel.shmmax value=40000000 state=present
 
   - name: install the postgresql.conf
-    template: src=postgresql.conf dest=/etc/postgresql/9.2/main/postgresql.conf mode=0644 owner=postgres group=postgres mode=0644
+    template: src=postgresql.conf.j2 dest=/etc/postgresql/9.2/main/postgresql.conf mode=0644 owner=postgres group=postgres mode=0644
 
   - name: install the pg_hba.conf
-    template: src=pg_hba.conf dest=/etc/postgresql/9.2/main/pg_hba.conf mode=0644 owner=postgres group=postgres mode=0644
+    template: src=pg_hba.conf.j2 dest=/etc/postgresql/9.2/main/pg_hba.conf mode=0644 owner=postgres group=postgres mode=0644
 
   - name: ensure /indicee/postgresql-data/9.2 exists
     file: state=directory path=/indicee/postgresql-data/9.2 owner=postgres group=postgres mode=2770

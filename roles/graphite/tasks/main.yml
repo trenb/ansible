@@ -1,15 +1,15 @@
 ---
   - name: put nginx repo
     copy: src=add_nginx_repo dest=/tmp/add_nginx_repo mode=0755
-    when_string: $ansible_lsb.codename == 'squeeze'
+    when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
   - name: add nginx repo
     command: /tmp/add_nginx_repo
-    when_string: $ansible_lsb.codename == 'squeeze'
+    when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
   - name: update apt cache
     apt: update-cache=yes
-    when_string: $ansible_lsb.codename == 'squeeze'
+    when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
   - name: installing base packages for graphite
     apt: pkg={{ item }} state=present
@@ -24,7 +24,7 @@
       - libxml2-dev
       - curl
       - nginx
-    when_string: $ansible_lsb.codename == 'squeeze'
+    when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
   - name: installing base packages for graphite
     apt: pkg={{ item }} state=present
@@ -39,7 +39,7 @@
       - libxml2-dev
       - curl
       - nginx-full
-    when_string: $ansible_lsb.codename == 'wheezy'
+    when_string: '"wheezy" in "${ansible_lsb.codename}"'
 
   - name: stop and remove nginx from init.d
     shell: service nginx stop;update-rc.d -f nginx remove
