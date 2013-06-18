@@ -1,6 +1,6 @@
 ---
   - name: put add_percona_repo
-    copy: src=add_percona_repo dest=/tmp/add_percona_repo mode=0755 
+    template: src=add_percona_repo.j2 dest=/tmp/add_percona_repo mode=0755 
 
   - name: add percona repository
     command: /tmp/add_percona_repo
@@ -21,7 +21,7 @@
     apt: pkg=percona-xtradb-cluster-client-5.5 state=present
   
   - name: install the my.cnf
-    copy: src=my.cnf dest=/etc/mysql/my.cnf mode=0644
+    template: src=my.cnf dest=/etc/mysql/my.cnf mode=0644
 
   - name: add mysql group
     group: name=mysql gid=115 state=present

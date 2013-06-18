@@ -97,4 +97,4 @@ host    all             all             ::1/128                 md5
 #local   replication     postgres                                peer
 #host    replication     postgres        127.0.0.1/32            md5
 #host    replication     postgres        ::1/128                 md5
-host   all   all   10.0.0.0/8 md5
+host   all   all   {{ pg_allow_traffic }} md5

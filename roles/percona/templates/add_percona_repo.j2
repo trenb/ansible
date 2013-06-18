@@ -5,7 +5,7 @@ SOURCES=/etc/apt/sources.list
 grep -qi percona $SOURCES
 if [[ $? -ne 0 ]]
 then
-  echo -e "\n# Percona repo\ndeb http://repo.percona.com/apt squeeze main\ndeb-src http://repo.percona.com/apt squeeze main" >> $SOURCES
+  echo -e "\n# Percona repo\ndeb http://repo.percona.com/apt {{ ansible_lsb.codename }} main\ndeb-src http://repo.percona.com/apt {{ ansible_lsb.codename }} main" >> $SOURCES
   gpg --keyserver  hkp://keys.gnupg.net --recv-keys 1C4CBDCDCD2EFD2A
   gpg -a --export CD2EFD2A | apt-key add -
 fi

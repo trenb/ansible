@@ -1,12 +1,15 @@
 ---
   - name: put nginx repo
     copy: src=add_nginx_repo dest=/tmp/add_nginx_repo mode=0755
+    when_string: $ansible_lsb.codename == 'squeeze'
 
   - name: add nginx repo
     command: /tmp/add_nginx_repo
+    when_string: $ansible_lsb.codename == 'squeeze'
 
   - name: update apt cache
     apt: update-cache=yes
+    when_string: $ansible_lsb.codename == 'squeeze'
 
   - name: installing base packages for graphite
     apt: pkg={{ item }} state=present
@@ -21,6 +24,22 @@
       - libxml2-dev
       - curl
       - nginx
+    when_string: $ansible_lsb.codename == 'squeeze'
+
+  - name: installing base packages for graphite
+    apt: pkg={{ item }} state=present
+    with_items:
+      - python-setuptools
+      - python-dev
+      - supervisor
+      - python-cairo
+      - libgetopt-mixed-perl
+      - libmcrypt4
+      - libssl1.0.0
+      - libxml2-dev
+      - curl
+      - nginx-full
+    when_string: $ansible_lsb.codename == 'wheezy'
 
   - name: stop and remove nginx from init.d
     shell: service nginx stop;update-rc.d -f nginx remove
@@ -66,8 +85,6 @@
 
   - name: copy supervisord.conf to /etc/supervisor
     copy: src=supervisord.conf dest=/etc/supervisor/supervisord.conf mode=0644
-    notify:
-      - restart supervisor
 
   - name: copy graphite configuration files
     copy: src={{ item }} dest=/opt/graphite/conf/{{ item }} mode=0644
@@ -91,6 +108,9 @@
 
   - name: stop the supervisor service
     command: service supervisor stop
+
+  - name: sleep for 5 seconds
+    command: sleep 5
   
   - name: start the supervisor service
     command: service supervisor start

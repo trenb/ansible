@@ -1,0 +1,25 @@
+---
+  - name: add debian backports for squeeze
+    copy: src=add_squeeze_backports_repo dest=/tmp/add_squeeze_backports_repo mode=0755
+    when_string: $ansible_lsb.codename == 'squeeze'
+
+  - name: add nginx repo
+    command: /tmp/add_nginx_repo
+    when_string: $ansible_lsb.codename == 'squeeze'
+
+  - name: install collectd
+    apt: pkg=collectd=5.1.0-3~bpo60+2 state=present
+    when_string: $ansible_lsb.codename == 'squeeze'
+
+  - name: install collectd
+    apt: pkg=collectd state=present
+    when_string: $ansible_lsb.codename == 'wheezy'
+
+  - name: install collectd.conf
+    template: src=collectd.conf.j2 dest=/etc/collectd.conf mode=0644
+
+  - name: install collectd supervisor conf
+    copy: src=collectd.conf dest=/etc/supervisor/conf.d/collectd.conf mode=0644
+
+  - name: start collectd
+    command: supervisorctl reload

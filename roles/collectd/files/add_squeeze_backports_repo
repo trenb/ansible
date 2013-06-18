@@ -1,0 +1,8 @@
+#!/bin/bash
+# Helper script to determine if nginx repo is present in /etc/apt/sources.list
+SOURCES=/etc/apt/sources.list
+grep -qi debian-backports $SOURCES
+if [[ $? -ne 0 ]]
+then
+  echo -e "\n# Backports repo\ndeb http://backports.debian.org/debian-backports squeeze-backports main" >> $SOURCES
+fi
