@@ -34,5 +34,6 @@
     
   - name: move /var/lib/postgresql/9.2/main to /indicee/postgresql-data/9.2/main
     command: mv /var/lib/postgresql/9.2/main /indicee/postgresql-data/9.2/main creates=/indicee/postgresql-data/9.2/main
-    notify:
-      - start postgresql
+
+  - name: start postgresql
+    command: service postgresql start
