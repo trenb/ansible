@@ -15,7 +15,7 @@
     command: tar -zxf ondemand.{{ ondemand_version }}.tgz chdir=/tmp creates=/tmp/installer
 
   - name: copy install_schema.sh
-    copy: src=install_schema.sh dest=/tmp/installer/install_schema.sh mode=0750
+    template: src=install_schema.sh.j2 dest=/tmp/installer/install_schema.sh mode=0750
 
   - name: install the ondemand schema
     command: /tmp/installer/install_schema.sh creates=/indicess/mysql-data/db/eclipse_app chdir=/tmp/installer

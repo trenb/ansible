@@ -18,7 +18,13 @@
     command: /etc/init.d/postgresql stop
 
   - name: update shmmax sysctl parameter
-    sysctl: name=kernel.shmmax value=40000000 state=present
+    sysctl: name=kernel.shmmax value=40000000000 state=present
+
+  - name: update shmall sysctl parameter
+    sysctl: name=kernel.shmall value=40000000000 state=present
+
+  - name: update shmmni sysctl parameter
+    sysctl: name=kernel.shmmni value=1345294336 state=present
 
   - name: install the postgresql.conf
     template: src=postgresql.conf.j2 dest=/etc/postgresql/9.2/main/postgresql.conf mode=0644 owner=postgres group=postgres mode=0644
