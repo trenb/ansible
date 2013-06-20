@@ -16,7 +16,7 @@ fi
 
 if [[ -x "/usr/bin/psql" ]]
 then
-  echo "ALTER USER postgres WITH ENCRYPTED PASSWORD '{{ pg_su_password }}'; CREATE DATABASE imp;" | su -l postgres -c psql
-  echo "CREATE EXTENSION citext SCHEMA public;" | su -l postgres -c psql imp
-  echo "CREATE ROLE indicee LOGIN ENCRYPTED PASSWORD '{{ pg_indicee_md5 }}' NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;GRANT CREATE, CONNECT, TEMP ON DATABASE imp TO indicee;" | su -l postgres -c psql imp
+  echo "ALTER USER postgres WITH ENCRYPTED PASSWORD '{{ pg_su_password }}'; CREATE DATABASE imp;" | su -l postgres -c "psql"
+  echo "CREATE EXTENSION citext SCHEMA public;" | su -l postgres -c "psql imp"
+  echo "CREATE ROLE indicee LOGIN ENCRYPTED PASSWORD '{{ pg_indicee_password }}' NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;GRANT CREATE, CONNECT, TEMP ON DATABASE imp TO indicee;" | su -l postgres -c "psql imp"
 fi
