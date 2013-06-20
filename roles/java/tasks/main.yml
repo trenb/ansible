@@ -6,10 +6,10 @@
     copy: src=jdk-6u31-linux-x64.bin dest=/indicee/java/jdk-6u31-linux-x64.bin mode=0750
 
   - name: copy over install_java.sh
-    copy: src=install_java.sh dest=/indicee/bin/install_java.sh mode=0750
+    copy: src=install_java.sh dest=/tmp/install_java.sh mode=0750
 
   - name: install jdk-6u31-linux-x64.bin
-    command: /indicee/bin/install_java.sh creates=/indicee/java/jdk1.6.0_31 chdir=/indicee/java
+    command: /tmp/install_java.sh creates=/indicee/java/jdk1.6.0_31 chdir=/indicee/java
 
   - name: create symlink for jdk
     file: src=/indicee/java/jdk1.6.0_31 dest=/indicee/java/jdk state=link

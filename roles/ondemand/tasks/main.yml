@@ -21,7 +21,7 @@
     command: /tmp/installer/install_schema.sh creates=/indicess/mysql-data/db/eclipse_app chdir=/tmp/installer
 
   - name: stop jboss
-    shell: svc -d /etc/service/jboss;killall java 
+    shell: supervisorctl stop jboss;killall java 
     ignore_errors: True
 
   - name: ensure the hosts file has the proper entries
@@ -62,5 +62,5 @@
   - name: symlink ondemand.cnf to debian.cnf
     command: ln -sf /etc/mysql/ondemand.cnf /etc/mysql/debian.cnf
 
-  - name: ensure that jboss service link is created
-    file: src=/indicee/svc/jboss dest=/etc/service/jboss state=link
+  - name: ensure that jboss service is started
+    command: supervisorctl reload

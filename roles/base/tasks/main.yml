@@ -10,8 +10,6 @@
     with_items:
       - bzip2
       - curl
-      - daemontools
-      - daemontools-run
       - dbus
       - gawk
       - git
@@ -47,8 +45,6 @@
     with_items:
       - bzip2
       - curl
-      - daemontools
-      - daemontools-run
       - dbus
       - gawk
       - git
@@ -197,6 +193,3 @@
 
   - name: ensure /indicee/bin exists
     file: path=/indicee/bin state=directory
-
-  - name: ensure /indicee/svc exists
-    file: path=/indicee/svc state=directory

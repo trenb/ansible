@@ -17,18 +17,14 @@
   - name: copy mysqlconnector module.xml files over
     copy: src=module.xml dest=/indicee/jboss/modules/com/mysql/main
 
+  - name: copy standalone.sh over
+    copy: src=standalone.sh dest=/indicee/jboss/bin/standalone.sh mode=0755
+
+  - name: copy start_jboss.sh over
+    template: src=start_jboss.sh.j2 dest=/indicee/bin/start_jboss.sh mode=0755
+
+  - name: copy jboss supervisor conf
+    copy: src=jboss.conf dest=/etc/supervisor/conf.d/jboss.conf mode=0644
+
   - name: symlink /indicee/jboss to /usr/local/jboss7
     file: src=/indicee/jboss dest=/usr/local/jboss7 state=link
-
-  - name: ensure /indicee/svc/jboss/log exists
-    file: path=/indicee/svc/jboss/log state=directory
-
-  - name: ensure /indicee/log/svc/jboss exists
-    file: path=/indicee/log/svc/jboss state=directory
-
-  - name: copy the run file for jboss
-    copy: src=jboss.run dest=/indicee/svc/jboss/run mode=755
-
-  - name: copy the run file for the jboss log process
-    copy: src=jboss.log.run dest=/indicee/svc/jboss/log/run mode=755
-  
