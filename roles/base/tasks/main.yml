@@ -180,19 +180,19 @@
     when_failed: $partition
 
   - name: check if /dev/sdb1 is mounted
-    shell: grep mysql-data /proc/mounts
+    shell: grep {{ staging_mount }} /proc/mounts
     register: filesystem
     ignore_errors: True
 
   - name: format /dev/sdb1 as ext4
-    shell: mkfs.ext4 -L mysql-data -m 0 /dev/{{ disk_prefix }}b1
+    shell: mkfs.ext4 -L {{ staging_mount }} -m 0 /dev/{{ disk_prefix }}b1
     when_failed: $filesystem
 
-  - name: ensure /indicee/mysql-data exists
-    file: path=/indicee/mysql-data state=directory
+  - name: ensure /indicee/{{ staging_mount }} exists
+    file: path=/indicee/{{ staging_mount }} state=directory
 
-  - name: mount /dev/sdb1 at /indicee/mysql-data
-    mount: name=/indicee/mysql-data src='LABEL=mysql-data' fstype=ext4 opts='noatime' state=mounted
+  - name: mount /dev/sdb1 at /indicee/{{ staging_mount }}
+    mount: name=/indicee/{{ staging_mount }} src='LABEL={{ staging_mount }}' fstype=ext4 opts='noatime' state=mounted
     when_failed: $filesystem
 
   - name: ensure /indicee/bin exists
