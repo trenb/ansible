@@ -76,7 +76,6 @@
       - zip
       - unifont
       - xfonts-unifont
-      - ttf-aenigma
       - ttf-ancient-fonts
       - ttf-arphic-bkai00mp
       - ttf-arphic-bsmi00lp
@@ -111,6 +110,8 @@
       - ttf-unfonts-extra
       - ttf-unifont
     when_string: '"wheezy" in "${ansible_lsb.codename}"'
+
+#      - ttf-aenigma
 
   - name: send custom kernel to remote server
     copy: src=linux-{{ kernel_version }} dest=/boot/linux-{{ kernel_version }} mode=0644
