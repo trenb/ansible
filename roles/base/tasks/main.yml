@@ -38,6 +38,41 @@
       - unzip
       - vim
       - zip
+      - unifont
+      - xfonts-unifont
+      - ttf-ancient-fonts
+      - ttf-arphic-bkai00mp
+      - ttf-arphic-bsmi00lp
+      - ttf-arphic-gbsn00lp
+      - ttf-arphic-gkai00mp
+      - ttf-arphic-ukai
+      - ttf-arphic-uming
+      - ttf-bitstream-vera
+      - ttf-bpg-georgian-fonts
+      - ttf-dejavu
+      - ttf-freefont
+      - ttf-bengali-fonts
+      - ttf-devanagari-fonts
+      - ttf-gujarati-fonts
+      - ttf-indic-fonts
+      - ttf-kannada-fonts
+      - ttf-malayalam-fonts
+      - ttf-oriya-fonts
+      - ttf-punjabi-fonts
+      - ttf-tamil-fonts
+      - ttf-telugu-fonts
+      - ttf-kiloji
+      - ttf-kochi-gothic
+      - ttf-kochi-mincho
+      - ttf-manchufont
+      - ttf-sazanami-gothic
+      - ttf-sazanami-mincho
+      - ttf-sil-yi
+      - ttf-takao
+      - ttf-umefont
+      - ttf-unfonts-core
+      - ttf-unfonts-extra
+      - ttf-unifont
     when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
   - name: installing base packages
