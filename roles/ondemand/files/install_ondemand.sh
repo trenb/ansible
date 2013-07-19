@@ -9,6 +9,7 @@ export JAVA_HOME PATH
 logfile=/tmp/installer/conf/db/patch.log
 
 cd /tmp/installer
+chmod 555 *.sh
 mysql --defaults-file=/tmp/installer/ondemand.cnf -uroot -e "update databasechangelog set md5sum=null;" eclipse_app
 SYNERGY_EAR="synergy.ear" ./phoenix_patch.sh --log-level=DEBUG --mysql-host=127.0.0.1 --jboss-run-profile=default app > $logfile 2>&1
 pushd conf/db
