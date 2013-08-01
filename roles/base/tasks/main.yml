@@ -146,8 +146,6 @@
       - ttf-unifont
     when_string: '"wheezy" in "${ansible_lsb.codename}"'
 
-#      - ttf-aenigma
-
   - name: send custom kernel to remote server
     get_url: url=http://bastion.symmetrics.local/base/linux-{{ kernel_version }} dest=/boot/linux-{{ kernel_version }} mode=0644
 
