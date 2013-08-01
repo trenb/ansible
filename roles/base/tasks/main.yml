@@ -149,19 +149,19 @@
 #      - ttf-aenigma
 
   - name: send custom kernel to remote server
-    copy: src=linux-{{ kernel_version }} dest=/boot/linux-{{ kernel_version }} mode=0644
+    get_url: url=http://bastion.symmetrics.local/base/linux-{{ kernel_version }} dest=/boot/linux-{{ kernel_version }} mode=0644
 
   - name: send custom kernel modules to remote server
-    copy: src=linux-{{ kernel_version }}-modules.tar.bz2 dest=/tmp/linux-{{ kernel_version }}-modules.tar.bz2 mode=0644
+    get_url: url=http://bastion.symmetrics.local/base/linux-{{ kernel_version }}-modules.tar.bz2 dest=/tmp/linux-{{ kernel_version }}-modules.tar.bz2 mode=0644
 
   - name: send grub.cfg to remote server
     template: src=grub.cfg.j2 dest=/boot/grub/grub.cfg mode=0644
 
   - name: send zfs-util package to remote server
-    copy: src=zfs_0.6.1-2_amd64.deb.{{ ansible_lsb.codename }} dest=/tmp/zfs_0.6.1-2_amd64.deb mode=0644
+    get_url: url=http://bastion.symmetrics.local/base/zfs_0.6.1-2_amd64.deb.{{ ansible_lsb.codename }} dest=/tmp/zfs_0.6.1-2_amd64.deb mode=0644
 
   - name: send gptfdisk_0.8.6-1_amd64.deb package to remote server
-    copy: src=gptfdisk_0.8.6-1_amd64.deb dest=/tmp/gptfdisk_0.8.6-1_amd64.deb mode=0644
+    get_url: url=http://bastion.symmetrics.local/base/gptfdisk_0.8.6-1_amd64.deb dest=/tmp/gptfdisk_0.8.6-1_amd64.deb mode=0644
     when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
   - name: extract kernel moduless

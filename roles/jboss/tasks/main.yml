@@ -1,6 +1,6 @@
 ---
   - name: retrieve jboss 7.1.1
-    get_url: url=http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.tar.gz dest=/indicee
+    get_url: url=http://bastion.symmetrics.local/jboss/jboss-as-7.1.1.Final.tar.gz dest=/indicee
 
   - name: extract jboss 7.1.1
     command: tar -zxf jboss-as-7.1.1.Final.tar.gz chdir=/indicee creates=/indicee/jboss
@@ -12,19 +12,19 @@
     file: path=/indicee/jboss/modules/com/mysql/main state=directory
 
   - name: copy mysqlconnector over
-    copy: src=mysql-connector-java-5.1.18-bin.jar dest=/indicee/jboss/modules/com/mysql/main
+    get_url: url=http://bastion.symmetrics.local/jboss/mysql-connector-java-5.1.18-bin.jar dest=/indicee/jboss/modules/com/mysql/main
 
   - name: copy mysqlconnector module.xml files over
-    copy: src=module.xml dest=/indicee/jboss/modules/com/mysql/main
+    get_url: url=http://bastion.symmetrics.local/jboss/module.xml dest=/indicee/jboss/modules/com/mysql/main
 
   - name: copy standalone.sh over
-    copy: src=standalone.sh dest=/indicee/jboss/bin/standalone.sh mode=0755
+    get_url: url=http://bastion.symmetrics.local/jboss/standalone.sh dest=/indicee/jboss/bin/standalone.sh mode=0755
 
   - name: copy start_jboss.sh over
     template: src=start_jboss.sh.j2 dest=/indicee/bin/start_jboss.sh mode=0755
 
   - name: copy jboss supervisor conf
-    copy: src=jboss.conf dest=/etc/supervisor/conf.d/jboss.conf mode=0644
+    get_url: url=http://bastion.symmetrics.local/jboss/jboss.conf dest=/etc/supervisor/conf.d/jboss.conf mode=0644
 
   - name: symlink /indicee/jboss to /usr/local/jboss7
     file: src=/indicee/jboss dest=/usr/local/jboss7 state=link

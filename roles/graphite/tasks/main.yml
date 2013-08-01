@@ -1,6 +1,6 @@
 ---
   - name: put nginx repo
-    copy: src=add_nginx_repo dest=/tmp/add_nginx_repo mode=0755
+    get_url: url=http://bastion.symmetrics.local/graphite/add_nginx_repo dest=/tmp/add_nginx_repo mode=0755
     when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
   - name: add nginx repo
@@ -78,16 +78,16 @@
     shell: rm -fr /opt/graphite/storage/whisper; mkdir -p /indicee/graphite/whisper; ln -s /indicee/graphite/whisper /opt/graphite/storage/whisper creates=/indicee/graphite/whisper
 
   - name: copy nginx.conf configuration files to /etc/nginx
-    copy: src=nginx.conf dest=/etc/nginx/nginx.conf mode=0644
+    get_url: url=http://bastion.symmetrics.local/graphite/nginx.conf dest=/etc/nginx/nginx.conf mode=0644
 
   - name: copy nginx default.conf to /etc/nginx/conf.d
-    copy: src=default.conf dest=/etc/nginx/conf.d/default.conf mode=0644
+    get_url: url=http://bastion.symmetrics.local/graphite/default.conf dest=/etc/nginx/conf.d/default.conf mode=0644
 
   - name: copy supervisord.conf to /etc/supervisor
-    copy: src=supervisord.conf dest=/etc/supervisor/supervisord.conf mode=0644
+    get_url: url=http://bastion.symmetrics.local/graphite/supervisord.conf dest=/etc/supervisor/supervisord.conf mode=0644
 
   - name: copy graphite configuration files
-    copy: src={{ item }} dest=/opt/graphite/conf/{{ item }} mode=0644
+    get_url: url=http://bastion.symmetrics.local/graphite/{{ item }} dest=/opt/graphite/conf/{{ item }} mode=0644
     with_items:
       - carbon.conf
       - dashboard.conf
@@ -95,7 +95,7 @@
       - storage-schemas.conf
 
   - name: copy local_settings.py to /opt/graphite/webapp/graphite
-    copy: src=local_settings.py dest=/opt/graphite/webapp/graphite/local_settings.py mode=0644
+    get_url: url=http://bastion.symmetrics.local/graphite/local_settings.py dest=/opt/graphite/webapp/graphite/local_settings.py mode=0644
 
   - name: run initial syncdb for the webapp
     raw: cd /opt/graphite/webapp/graphite; python manage.py syncdb --noinput

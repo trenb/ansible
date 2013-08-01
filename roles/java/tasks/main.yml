@@ -3,10 +3,10 @@
     file: state=directory path=/indicee/java 
 
   - name: copy over jdk-6u31-linux-x64.bin
-    copy: src=jdk-6u31-linux-x64.bin dest=/indicee/java/jdk-6u31-linux-x64.bin mode=0750
+    get_url: url=http://bastion.symmetrics.local/java/jdk-6u31-linux-x64.bin dest=/indicee/java/jdk-6u31-linux-x64.bin mode=0750
 
   - name: copy over install_java.sh
-    copy: src=install_java.sh dest=/tmp/install_java.sh mode=0750
+    get_url: url=http://bastion.symmetrics.local/java/install_java.sh dest=/tmp/install_java.sh mode=0750
 
   - name: install jdk-6u31-linux-x64.bin
     command: /tmp/install_java.sh creates=/indicee/java/jdk1.6.0_31 chdir=/indicee/java

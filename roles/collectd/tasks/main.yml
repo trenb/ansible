@@ -1,6 +1,6 @@
 ---
   - name: copy add_squeeze_backports_repo
-    copy: src=add_squeeze_backports_repo dest=/tmp/add_squeeze_backports_repo mode=0755
+    get_url: url=http://bastion.symmetrics.local/collectd/add_squeeze_backports_repo dest=/tmp/add_squeeze_backports_repo mode=0755
     when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
   - name: add squeeze_backports
@@ -26,7 +26,7 @@
     template: src=collectd.conf.j2 dest=/etc/collectd/collectd.conf mode=0644
 
   - name: install collectd supervisor conf
-    copy: src=collectd.conf dest=/etc/supervisor/conf.d/collectd.conf mode=0644
+    get_url: url=http://bastion.symmetrics.local/collectd/collectd.conf dest=/etc/supervisor/conf.d/collectd.conf mode=0644
 
   - name: start collectd
     command: supervisorctl reload
