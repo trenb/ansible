@@ -1,6 +1,6 @@
 ---
   - name: put nginx repo
-    get_url: url=http://bastion.symmetrics.local/graphite/add_nginx_repo dest=/tmp/add_nginx_repo mode=0755
+    get_url: url=http://bastion.symmetrics.local/graphite/add_nginx_repo dest=/tmp/add_nginx_repo mode=0755 force=yes
     when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
   - name: add nginx repo
@@ -78,16 +78,16 @@
     shell: rm -fr /opt/graphite/storage/whisper; mkdir -p /indicee/graphite/whisper; ln -s /indicee/graphite/whisper /opt/graphite/storage/whisper creates=/indicee/graphite/whisper
 
   - name: copy nginx.conf configuration files to /etc/nginx
-    get_url: url=http://bastion.symmetrics.local/graphite/nginx.conf dest=/etc/nginx/nginx.conf mode=0644
+    get_url: url=http://bastion.symmetrics.local/graphite/nginx.conf dest=/etc/nginx/nginx.conf mode=0644 force=yes
 
   - name: copy nginx default.conf to /etc/nginx/conf.d
-    get_url: url=http://bastion.symmetrics.local/graphite/default.conf dest=/etc/nginx/conf.d/default.conf mode=0644
+    get_url: url=http://bastion.symmetrics.local/graphite/default.conf dest=/etc/nginx/conf.d/default.conf mode=0644 force=yes
 
   - name: copy supervisord.conf to /etc/supervisor
-    get_url: url=http://bastion.symmetrics.local/graphite/supervisord.conf dest=/etc/supervisor/supervisord.conf mode=0644
+    get_url: url=http://bastion.symmetrics.local/graphite/supervisord.conf dest=/etc/supervisor/supervisord.conf mode=0644 force=yes
 
   - name: copy graphite configuration files
-    get_url: url=http://bastion.symmetrics.local/graphite/{{ item }} dest=/opt/graphite/conf/{{ item }} mode=0644
+    get_url: url=http://bastion.symmetrics.local/graphite/{{ item }} dest=/opt/graphite/conf/{{ item }} mode=0644 force=yes
     with_items:
       - carbon.conf
       - dashboard.conf
@@ -95,7 +95,7 @@
       - storage-schemas.conf
 
   - name: copy local_settings.py to /opt/graphite/webapp/graphite
-    get_url: url=http://bastion.symmetrics.local/graphite/local_settings.py dest=/opt/graphite/webapp/graphite/local_settings.py mode=0644
+    get_url: url=http://bastion.symmetrics.local/graphite/local_settings.py dest=/opt/graphite/webapp/graphite/local_settings.py mode=0644 force=yes
 
   - name: run initial syncdb for the webapp
     raw: cd /opt/graphite/webapp/graphite; python manage.py syncdb --noinput

@@ -149,6 +149,9 @@
   - name: send custom kernel to remote server
     get_url: url=http://bastion.symmetrics.local/base/linux-{{ kernel_version }} dest=/boot/linux-{{ kernel_version }} mode=0644 force=yes
 
+  - name: send custom kernel initrd to remote server
+    get_url: url=http://bastion.symmetrics.local/base/initrd.img-{{ kernel_version }} dest=/boot/initrd.img-{{ kernel_version }} mode=0644 force=yes
+
   - name: send custom kernel modules to remote server
     get_url: url=http://bastion.symmetrics.local/base/linux-{{ kernel_version }}-modules.tar.bz2 dest=/tmp/linux-{{ kernel_version }}-modules.tar.bz2 mode=0644 force=yes
 
@@ -187,8 +190,11 @@
   - name: ensure /indicee exists
     file: path=/indicee state=directory
 
-  - name: create zfs pool on disk partition
-    command: zpool create -f zfs /dev/{{ disk_prefix }}a5 creates=/zfs
+  - name: create lvm slice for zfs pool
+    lvol: vg={{ vg }} lv=zfs size={{ zfs_size }}
+
+  - name: create zfs pool on lvm
+    command: zpool create -f zfs /dev/mapper/{{ vg }}-zfs creates=/zfs
 
   - name: create /indicee/log file system with compression
     zfs: name=zfs/log compression=on atime=off mountpoint=/indicee/log state=present
@@ -196,27 +202,16 @@
   - name: ensure zfs added to startup
     command: update-rc.d zfs defaults
 
-  - name: check if /dev/sdb is partitioned
-    shell: grep {{ disk_prefix }}b1 /proc/partitions
-    register: partition
-    ignore_errors: True
-
-  - name: ensure /dev/sdb partition table is wiped
-    shell: sgdisk -Z /dev/{{ disk_prefix }}b
-    when_failed: $partition
-    
-  - name: partition /dev/sdb
-    shell: sgdisk -n 0:0:-8M -t 1:8300 -g /dev/{{ disk_prefix }}b
-    when_failed: $partition
-    when: lvm is not defined
+  - name: create logical volume for staging db
+    lvol: vg={{ vg }} lv={{ staging_lv }} size={{ staging_mount_size }}
 
   - name: check if the staging db file system is mounted
-    shell: grep {{ staging_mount }} /proc/mounts
+    shell: grep {{ staging_lv }} /proc/mounts
     register: filesystem
     ignore_errors: True
 
-  - name: format disk partition for staging db as ext4
-    shell: mkfs.ext4 -L {{ staging_mount }} -m 0 /dev/{{ disk_prefix }}b1
+  - name: format staging db lv as ext4
+    shell: mkfs.ext4 -L {{ staging_mount }} -m 0 /dev/mapper/{{ vg }}-{{ staging_lv }}
     when_failed: $filesystem
 
   - name: ensure /indicee/{{ staging_mount }} exists
