@@ -12,7 +12,7 @@
     when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
   - name: install collectd
-    apt: pkg=collectd=5.1.0-3~bpo60+2 state=present
+    apt: pkg=collectd-core=5.1.0-3~bpo60+2 state=present
     when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
   - name: install collectd
