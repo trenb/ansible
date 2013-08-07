@@ -172,14 +172,14 @@
     command: dpkg -i /tmp/gptfdisk_0.8.6-1_amd64.deb creates=/usr/sbin/sgdisk
     when_string: '"squeeze" in "${ansible_lsb.codename}"'
 
-  - name: reboot remote node to pick up new kernel
-    command: shutdown -r now
-
   - name: change hostname
     lineinfile: dest=/etc/hostname regexp=^.* line={{ name }}
 
   - name: change 127.0.1.1 to match hostname
     lineinfile: dest=/etc/hosts regexp=^127\.0\.1\.1 line="127.0.1.1 {{ name }}"
+
+  - name: reboot remote node to pick up new kernel
+    command: shutdown -r now
 
   - name: wait for machine to come back
     local_action: wait_for host={{ inventory_hostname }} port=22 delay=15 timeout=300
@@ -208,7 +208,6 @@
   - name: partition /dev/sdb
     shell: sgdisk -n 0:0:-8M -t 1:8300 -g /dev/{{ disk_prefix }}b
     when_failed: $partition
-    when: lvm is not defined
 
   - name: check if the staging db file system is mounted
     shell: grep {{ staging_mount }} /proc/mounts
