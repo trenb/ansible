@@ -1,0 +1,21 @@
+---
+  - name: Transfer over haproxy.tar.bz2
+    get_url: url=http://bastion.symmetrics.local/haproxy/haproxy.tar.bz2 dest=/indicee force=yes mode=0700
+
+  - name: extract haproxy.tar.bz2
+    command: tar -jxf /indicee/haproxy.tar.bz2 -C /indicee/ creates=/indicee/haproxy-ssl chdir=/indicee
+
+  - name: Transfer over haproxy.conf
+    get_url: url=http://bastion.symmetrics.local/haproxy/sslproxy.conf dest=/indicee/haproxy-ssl/conf/sslproxy.conf
+
+  - name: Transfer over ondemand pem
+    get_url: url=http://bastion.symmetrics.local/haproxy/certs/ondemand.symmetrics.com.pem dest=/indicee/haprox-ssl/certs/default/ondemand.symmetrics.com.pem force=yes mode=0600
+
+  - name: Transfer over bpe pem
+    get_url: url=http://bastion.symmetrics.local/haproxy/certs/contactcenterondemand.bpiedu.com.pem dest=/indicee/haproxy-ssl/certs/sni/contactcenterondemand.bpiedu.com.pem force=yes mode=0600
+
+  - name: Transfer over init script for haproxyd
+    get_url: url=http://bastion.symmetrics.local/haproxy/haproxyd.init dest=/etc/init.d/haproxyd force=yes mode=0555
+
+  - name: Add haproxyd to runlevels
+    command: update-rc.d haproxyd defaults
