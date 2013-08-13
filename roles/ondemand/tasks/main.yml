@@ -62,5 +62,8 @@
   - name: symlink ondemand.cnf to debian.cnf
     command: ln -sf /etc/mysql/ondemand.cnf /etc/mysql/debian.cnf
 
+  - name: Install cron_cleantmp.sh into cron
+    get_url: url=http://bastion.symmetrics.local/ondemand/cron_cleantmp.sh dest=/etc/cron.daily/cron_cleantmp.sh force=yes
+
   - name: ensure that jboss service is started
     command: supervisorctl reload
