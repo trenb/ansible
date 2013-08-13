@@ -8,11 +8,11 @@
   - name: ensure that /indicee/phoenix is symlinked to /usr/local/synergy
     file: src=/indicee/phoenix dest=/usr/local/synergy state=link
 
-  - name: transfer over latest nVision OnDemand software
-    get_url: url=http://bastion.symmetrics.local/ondemand/ondemand.latest.tgz dest=/tmp/ondemand.latest.tgz mode=0640 force=yes
+  - name: transfer over nVision OnDemand software
+    get_url: url=http://bastion.symmetrics.local/ondemand/ondemand.{{ ondemand_release }}.tgz dest=/tmp/ondemand.{{ ondemand_release }}.tgz mode=0640 force=yes
 
   - name: extract package
-    command: tar -zxf ondemand.latest.tgz chdir=/tmp creates=/tmp/installer
+    command: tar -zxf ondemand.{{ ondemand_release }}.tgz chdir=/tmp creates=/tmp/installer
 
   - name: copy install_schema.sh
     template: src=install_schema.sh.j2 dest=/tmp/installer/install_schema.sh mode=0750
