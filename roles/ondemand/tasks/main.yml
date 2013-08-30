@@ -63,7 +63,7 @@
     command: ln -sf /etc/mysql/ondemand.cnf /etc/mysql/debian.cnf
 
   - name: Install cron_cleantmp.sh into cron
-    get_url: url=http://bastion.symmetrics.local/ondemand/cron_cleantmp.sh dest=/etc/cron.daily/cron_cleantmp.sh force=yes
+    get_url: url=http://bastion.symmetrics.local/ondemand/cron_cleantmp.sh dest=/etc/cron.daily/cron_cleantmp.sh force=yes mode=0755
 
   - name: ensure that jboss service is started
     command: supervisorctl reload
