@@ -64,7 +64,6 @@ menuentry 'Symmetrics nVision On-Demand, with Linux {{ kernel_version }}' --clas
 	insmod part_msdos
 	insmod ext2
 	set root='(hd0,msdos1)'
-	search --no-floppy --fs-uuid --set 1c18e9b9-b624-4fbb-8c01-230640345c75
 	echo	'Loading Linux {{ kernel_version }} ...'
 	linux	/linux-{{ kernel_version }} root=/dev/mapper/{{ vg }}-lvslash ro  quiet zfs.zfs_arc_max=536870912
         echo    'Loading initrd ...'
