@@ -156,7 +156,7 @@
     template: src=grub.cfg.j2 dest=/boot/grub/grub.cfg mode=0644
 
   - name: send zfs-util package to remote server
-    get_url: url=http://bastion.symmetrics.local/base/zfs_0.6.1-2_amd64.deb.{{ ansible_lsb.codename }} dest=/tmp/zfs_0.6.1-2_amd64.deb mode=0644 force=yes
+    get_url: url=http://bastion.symmetrics.local/base/zfs_0.6.2-1_amd64.deb.{{ ansible_lsb.codename }} dest=/tmp/zfs_0.6.2-1_amd64.deb mode=0644 force=yes
 
   - name: send gptfdisk_0.8.6-1_amd64.deb package to remote server
     get_url: url=http://bastion.symmetrics.local/base/gptfdisk_0.8.6-1_amd64.deb dest=/tmp/gptfdisk_0.8.6-1_amd64.deb mode=0644 force=yes
@@ -166,7 +166,7 @@
     command: tar -jxf /tmp/linux-{{ kernel_version }}-modules.tar.bz2 -C /lib/modules chdir=/lib/modules creates=/lib/modules/{{ kernel_version }}
 
   - name: install zfs-util package
-    command: dpkg -i /tmp/zfs_0.6.1-2_amd64.deb creates=/etc/init.d/zfs 
+    command: dpkg -i /tmp/zfs_0.6.2-1_amd64.deb creates=/etc/init.d/zfs 
 
   - name: install gptfdisk package
     command: dpkg -i /tmp/gptfdisk_0.8.6-1_amd64.deb creates=/usr/sbin/sgdisk
