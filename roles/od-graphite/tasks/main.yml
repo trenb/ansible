@@ -87,7 +87,7 @@
     get_url: url=http://bastion.symmetrics.local/graphite/default.conf dest=/etc/nginx/conf.d/default.conf mode=0644 force=yes
 
   - name: copy htpasswd file to /etc/nginx/auth
-    get_url: url=http://bastion.symmetrics.local/graphite/htpasswd dest=/etc/nginx/auth/htpasswd mode=0600 force=yes
+    get_url: url=http://bastion.symmetrics.local/graphite/htpasswd dest=/etc/nginx/auth/htpasswd mode=0600 owner=www-data force=yes
 
   - name: copy supervisord.conf to /etc/supervisor
     get_url: url=http://bastion.symmetrics.local/graphite/supervisord.conf dest=/etc/supervisor/supervisord.conf mode=0644 force=yes
