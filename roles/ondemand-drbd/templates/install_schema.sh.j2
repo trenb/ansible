@@ -1,0 +1,22 @@
+#!/bin/bash
+# Helper script to install the base OnDemand schema
+# Tren Blackburn - Symmetrics - April 30 2013
+#
+# Updated May 3 2013
+# Need to run mysql_secure_installation to ensure things are setup for the root user
+#
+# Updated June 19 2013
+# Adding configuration of postgresql here if it's installed
+if [[ -f "/tmp/installer/andromeda.sql" && ! -d "/indicee/mysql-data/db/eclipse_app" && ! -d "/indicee/mysql-data/db/quartz" ]]
+then
+#  PASSWORD=$(grep "password =" /tmp/installer/ondemand.cnf | sed -e 's/password = //g' | head -n1)
+  echo -e "\n\n{{ mysql_password }}\n{{ mysql_password }}\n\n\n\n\n" | mysql_secure_installation
+  mysql --defaults-file=/tmp/installer/ondemand.cnf -uroot < /tmp/installer/andromeda.sql
+fi
+
+if [[ -x "/usr/bin/psql" ]]
+then
+  echo "ALTER USER postgres WITH ENCRYPTED PASSWORD '{{ pg_su_password }}'; CREATE DATABASE imp;" | su -l postgres -c "psql"
+  echo "CREATE EXTENSION citext SCHEMA public;" | su -l postgres -c "psql imp"
+  echo "CREATE ROLE indicee LOGIN ENCRYPTED PASSWORD '{{ pg_indicee_password }}' NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;GRANT CREATE, CONNECT, TEMP ON DATABASE imp TO indicee;" | su -l postgres -c "psql imp"
+fi

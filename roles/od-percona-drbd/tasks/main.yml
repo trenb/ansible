@@ -1,0 +1,53 @@
+---
+  - name: put add_percona_repo
+    template: src=add_percona_repo.j2 dest=/tmp/add_percona_repo mode=0755 
+
+  - name: add percona repository
+    command: /tmp/add_percona_repo
+
+  - name: update apt cache
+    apt: update-cache=yes
+
+  - name: setup policy-rc.d to ensure scripts are not run on secondary node
+    get_url: url=http://bastion.symmetrics.local/base/policy-rc.d dest=/usr/sbin/policy-rc.d mode=0755 force=yes
+    when_string: '"${host}" in "${secondary_host}"'    
+
+  - name: install libdbd-mysql-perl
+    apt: pkg=libdbd-mysql-perl state=present
+
+  - name: install libmysqlclient18-dev
+    apt: pkg=libmysqlclient18-dev state=present
+
+  - name: install percona-xtrabackup
+    apt: pkg=percona-xtrabackup state=present
+
+  - name: install percona-server-client-5.5
+    apt: pkg=percona-server-client-5.5 state=present
+  
+  - name: install the my.cnf
+    template: src=my.cnf.j2 dest=/etc/mysql/my.cnf mode=0644
+
+  - name: add mysql group
+    group: name=mysql gid=115 state=present
+
+  - name: add mysql user
+    user: name=mysql group=mysql uid=110 shell=/bin/false home=/indicee/mysql-data state=present
+
+  - name: ensure /indicee/mysql-data exists
+    file: state=directory path=/indicee/mysql-data owner=mysql group=mysql mode=2770
+
+  - name: ensure percona db data directory exists
+    file: state=directory path=/indicee/mysql-data/db owner=mysql group=mysql mode=2770
+
+  - name: ensure percona db log directory exists
+    file: state=directory path=/indicee/mysql-data/log owner=mysql group=mysql mode=2770
+    
+  - name: install percona-server-common-5.5
+    apt: pkg=percona-server-common-5.5 state=present
+
+  - name: install percona-server-server-5.5
+    apt: pkg=percona-server-server-5.5 state=present
+
+  - name: remove policy-rc.d on secondary host
+    shell: rm -f /usr/sbin/policy-rc.d
+    when_string: '"${host}" in "${secondary_host}"'
