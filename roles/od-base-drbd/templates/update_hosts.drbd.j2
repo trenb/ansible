@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+# Script that will take variables from ansible to update the hosts file with the
+# secondary node information.
+#
+# Tren Blackburn - Symmetrics
+# September 9, 2013
+HOSTS="/etc/hosts"
+PRIM_IP="{{ primary_ip }}"
+SEC_IP="{{ secondary_ip }}"
+PRIM_HOST="{{ primary_host }}"
+SEC_HOST="{{ seconary_host }}"
+
+# If the primary hostname is not found in the hosts file, add it and its IP
+# If the primary hostname is found in the hosts file, update it with the proper IP
+PRIM_EXIST=$(grep -c $PRIM_HOST $HOSTS)
+if [[ $PRIM_EXIST -eq 0 ]]
+then
+  echo -e "$PRIM_IP\t$PRIM_HOST" >> $HOSTS
+else
+  sed -i "/$PRIM_HOST/c$PRIM_IP\t$PRIM_HOST" $HOSTS
+fi
+
+# If the secondary hostname is not found in the hosts file, add it and its IP
+# If the secondary hostname is found in the hosts file, update it with the proper IP
+SEC_EXIST=$(grep -c $SEC_HOST $HOSTS)
+if [[ $SEC_EXIST -eq 0 ]]
+then
+  echo -e "$SEC_IP\t$SEC_HOST" >> $HOSTS
+else
+  sed -i "/$SEC_HOST/c$SEC_IP\t$SEC_HOST" $HOSTS
+fi

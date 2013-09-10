@@ -1,0 +1,182 @@
+---
+  - name: install python-apt
+    raw: "apt-get install -y python-apt"
+
+  - name: update apt cache
+    apt: update-cache=yes
+
+  - name: installing base packages
+    apt: pkg={{ item }} state=present
+    with_items:
+      - bzip2
+      - curl
+      - dbus
+      - gawk
+      - git
+      - heirloom-mailx
+      - imagemagick
+      - iotop
+      - jed
+      - libaio1
+      - libcache-perl
+      - libdbi-perl
+      - libicu44
+      - libio-multiplex-perl
+      - libipc-sharelite-perl
+      - libnet-cidr-perl
+      - libnet-snmp-perl
+      - libopts25
+      - netcat-openbsd
+      - nload
+      - ntp
+      - python-configobj
+      - python-psutil
+      - screen
+      - ssh
+      - sudo
+      - tcpdump
+      - unzip
+      - vim
+      - zip
+      - unifont
+      - xfonts-unifont
+      - ttf-ancient-fonts
+      - ttf-arphic-bkai00mp
+      - ttf-arphic-bsmi00lp
+      - ttf-arphic-gbsn00lp
+      - ttf-arphic-gkai00mp
+      - ttf-arphic-ukai
+      - ttf-arphic-uming
+      - ttf-bitstream-vera
+      - ttf-bpg-georgian-fonts
+      - ttf-dejavu
+      - ttf-freefont
+      - ttf-bengali-fonts
+      - ttf-devanagari-fonts
+      - ttf-gujarati-fonts
+      - ttf-indic-fonts
+      - ttf-kannada-fonts
+      - ttf-malayalam-fonts
+      - ttf-oriya-fonts
+      - ttf-punjabi-fonts
+      - ttf-tamil-fonts
+      - ttf-telugu-fonts
+      - ttf-kiloji
+      - ttf-kochi-gothic
+      - ttf-kochi-mincho
+      - ttf-manchufont
+      - ttf-sazanami-gothic
+      - ttf-sazanami-mincho
+      - ttf-sil-yi
+      - ttf-takao
+      - ttf-umefont
+      - ttf-unfonts-core
+      - ttf-unfonts-extra
+      - ttf-unifont
+
+  - name: remove portmap from init
+    shell: update-rc.d -f portmap remove;service portmap stop
+
+  - name: remove rpc.statd from init
+    shell: update-rc.d -f nfs-common remove;service nfs-common stop
+
+  - name: send custom kernel to remote server
+    get_url: url=http://bastion.symmetrics.local/base/linux-{{ kernel_version }} dest=/boot/linux-{{ kernel_version }} mode=0644 force=yes
+
+  - name: send custom kernel initrd to remote server
+    get_url: url=http://bastion.symmetrics.local/base/initrd.img-{{ kernel_version }} dest=/boot/initrd.img-{{ kernel_version }} mode=0644 force=yes
+
+  - name: send custom kernel modules to remote server
+    get_url: url=http://bastion.symmetrics.local/base/linux-{{ kernel_version }}-modules.tar.bz2 dest=/tmp/linux-{{ kernel_version }}-modules.tar.bz2 mode=0644 force=yes
+
+  - name: send grub.cfg to remote server
+    template: src=grub.cfg.j2 dest=/boot/grub/grub.cfg mode=0644
+
+  - name: send gptfdisk_0.8.6-1_amd64.deb package to remote server
+    get_url: url=http://bastion.symmetrics.local/base/gptfdisk_0.8.6-1_amd64.deb dest=/tmp/gptfdisk_0.8.6-1_amd64.deb mode=0644 force=yes
+
+  - name: extract kernel moduless
+    command: tar -jxf /tmp/linux-{{ kernel_version }}-modules.tar.bz2 -C /lib/modules chdir=/lib/modules creates=/lib/modules/{{ kernel_version }}
+
+  - name: install gptfdisk package
+    command: dpkg -i /tmp/gptfdisk_0.8.6-1_amd64.deb creates=/usr/sbin/sgdisk
+
+  - name: change hostname
+    lineinfile: dest=/etc/hostname regexp=^.* line={{ name }}
+
+  - name: change 127.0.1.1 to match hostname
+    lineinfile: dest=/etc/hosts regexp=^127\.0\.1\.1 line="127.0.1.1 {{ name }}"
+
+  - name: transfer script to update hosts file
+    template: src=update_hosts.drbd.j2 dest=/tmp/update_hosts.sh mode=0755 
+
+  - name: update the hosts file with primary and secondary host information
+    command: /tmp/update_hosts.sh chdir=/tmp
+  
+  - name: reboot remote node to pick up new kernel
+    command: shutdown -r now
+
+  - name: wait for machine to come back
+    local_action: wait_for host={{ inventory_hostname }} port=22 delay=15 timeout=300
+
+  - name: ensure /indicee exists
+    file: path=/indicee state=directory
+
+  - name: create lvm slice for drbd
+    lvol: vg={{ vg }} lv=drbd size={{ drbd_size }}
+
+  - name: transfer over the drbd utilities package
+    get_url: url=http://bastion.symmetrics.local/drbd8/drbd8-utils_8.3.11-0_amd64.deb dest=/tmp/drbd8-utils_8.3.11-0_amd64.deb mode=0644 force=yes
+
+  - name: install drbd
+    command: dpkg -i /tmp/drbd8-utils_8.3.11-0_amd64.deb creates=/etc/drbd.d/global_common.conf
+
+  - name: transfer over global_common.conf
+    get_url: url=http://bastion.symmetrics.local/drbd8/global_common.conf dest=/etc/drbd.d/global_common.conf mode=0644 force=yes
+
+  - name: transfer over drbd resource
+    template: src=drbd.res.j2 dest=/etc/drbd.d/drbd.res mode=0644
+
+  - name: load the drbd module
+    command: modprobe drbd
+
+  - name: bring up the drbd resource
+    command: drbdadm up drbd
+
+  - name: initiate the initial synchronization on the primary host only
+    shell: drbdadm -- --overwrite-data-of-peer primary drbd
+    when_string: '"${host}" in "${primary_host}"'
+
+  - name: format drbd
+    command: mkfs.ext4 -Ldrbd -m0 /dev/drbd0
+    when_string: '"${host}" in "${primary_host}"'
+
+  - name: tune drbd file system
+    command: tune2fs -c 0 -i 0 /dev/drbd0
+    when_string: '"${host}" in "${primary_host}"'
+
+  - name: install heartbeat
+    apt: pkg=heartbeat state=present
+
+  - name: transfer over ha.cf
+    template: src=ha.cf.j2 dest=/etc/ha.d/ha.cf mode=0644
+
+  - name: transfer over authkeys
+    get_url: url=http://bastion.symmetrics.local/heartbeat/authkeys dest=/etc/ha.d/authkeys mode=0600 force=yes
+
+  - name: transfer over first stage haresources
+    template: src=haresources.j2 dest=/etc/ha.d/haresources mode=0644 force=yes
+
+  - name: start heartbeat
+    command: service heartbeat start
+
+  - name: sleep for 60 seconds 
+    command: sleep 60
+
+  - name: ensure /indicee/postgresql-data exists
+    file: path=/indicee/postgresql-data state=directory
+    when_string: '"${host}" in "${primary_host}"'
+
+  - name: ensure /indicee/bin exists
+    file: path=/indicee/bin state=directory
+    when_string: '"${host}" in "${primary_host}"'

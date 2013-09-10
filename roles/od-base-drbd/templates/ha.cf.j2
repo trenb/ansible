@@ -1,0 +1,13 @@
+autojoin none
+nice_failback on
+auto_failback off
+ucast eth0 {{ primary_ip }}
+ucast eth0 {{ secondary_ip }}
+udpport 694
+warntime 5
+deadtime 15
+initdead 60
+keepalive 2
+node {{ primary_host }}
+node {{ secondary_host }}
+crm off
