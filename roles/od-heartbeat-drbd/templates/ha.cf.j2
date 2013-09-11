@@ -1,8 +1,8 @@
 autojoin none
 nice_failback on
 auto_failback off
-ucast eth0 {{ primary_ip }}
-ucast eth0 {{ secondary_ip }}
+ucast {{ shared_int }} {{ primary_ip }}
+ucast {{ shared_int }} {{ secondary_ip }}
 udpport 694
 warntime 5
 deadtime 15

@@ -1,0 +1,7 @@
+{{ primary_host }} \
+drbddisk::drbd \
+Filesystem::/dev/drbd0::/indicee::ext4 \
+IPaddr2::{{ shared_ip }}/{{ shared_subnet }}/{{ shared_int }} \
+mysql \
+postgresql \
+supervisor
