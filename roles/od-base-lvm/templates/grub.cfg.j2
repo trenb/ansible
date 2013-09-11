@@ -36,7 +36,6 @@ insmod lvm
 insmod part_msdos
 insmod ext2
 set root='(hd0,msdos2)'
-search --no-floppy --fs-uuid --set 768a26a5-b996-4125-8ee5-d6c9be4440be
 if loadfont /usr/share/grub/unicode.pf2 ; then
   set gfxmode=640x480
   load_video
@@ -46,7 +45,6 @@ terminal_output gfxterm
 insmod part_msdos
 insmod ext2
 set root='(hd0,msdos1)'
-search --no-floppy --fs-uuid --set 1c18e9b9-b624-4fbb-8c01-230640345c75
 set locale_dir=($root)/grub/locale
 set lang=en
 insmod gettext
@@ -59,7 +57,7 @@ set menu_color_highlight=white/blue
 ### END /etc/grub.d/05_debian_theme ###
 
 ### BEGIN /etc/grub.d/10_linux ###
-menuentry 'Symmetrics nVision On-Demand, with Linux {{ kernel_version }}' --class debian --class gnu-linux --class gnu --class os {
+menuentry 'Symmetrics nVision OnDemand, with Linux {{ kernel_version }}' --class debian --class gnu-linux --class gnu --class os {
         insmod lvm
 	insmod part_msdos
 	insmod ext2
