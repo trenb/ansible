@@ -25,6 +25,9 @@
   - name: stop and remove nginx from init.d
     shell: service nginx stop;update-rc.d -f nginx remove
 
+  - name: stop and remove supervisor from init.d
+    shell: service supervisor stop;update-rc.d -f supervisor remove
+
   - name: install pip
     easy_install: name=pip
 
