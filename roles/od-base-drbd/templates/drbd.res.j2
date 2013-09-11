@@ -5,7 +5,6 @@ resource drbd {
           max-buffers 8000;
           max-epoch-size 8000;
           sndbuf-size 0;
-          verify-alg crc32c;
           data-integrity-alg crc32c;
           after-sb-0pri discard-zero-changes;
           after-sb-1pri discard-secondary;       
@@ -15,6 +14,7 @@ resource drbd {
      }
      syncer {
           csums-alg crc32c;
+          verify-alg crc32c;
      }
      disk {
           on-io-error call-local-io-error;
