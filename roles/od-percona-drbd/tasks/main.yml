@@ -48,6 +48,9 @@
   - name: install percona-server-server-5.5
     apt: pkg=percona-server-server-5.5 state=present
 
+  - name: remove mysql from init
+    shell: update-rc.d -f mysql remove
+
   - name: remove policy-rc.d on secondary host
     shell: rm -f /usr/sbin/policy-rc.d
     when_string: '"${host}" in "${secondary_host}"'

@@ -50,6 +50,9 @@
     command: service postgresql start
     when_string: '"${host}" in "${primary_host}"'
 
+  - name: remove postgresql from init
+    shell: update-rc.d -f postgresql remove
+
   - name: remove policy-rc.d on secondary host
     shell: rm -f /usr/sbin/policy-rc.d
     when_string: '"${host}" in "${secondary_host}"'
