@@ -50,6 +50,10 @@
 
   - name: remove mysql from init
     shell: update-rc.d -f mysql remove
+  
+  - name: stop mysql on the secondary node
+    shell: service mysql stop
+    when_string: '"${name}" in "${secondary_host}"'
 
   - name: remove policy-rc.d on secondary host
     shell: rm -f /usr/sbin/policy-rc.d
