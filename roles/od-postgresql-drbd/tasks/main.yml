@@ -20,6 +20,7 @@
 
   - name: stop postgresql-9.2
     command: /etc/init.d/postgresql stop
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: update shmmax sysctl parameter
     sysctl: name=kernel.shmmax value=40000000000 state=present
