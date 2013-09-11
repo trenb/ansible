@@ -1,2 +1,2 @@
-*.yml
 ansible_hosts
+plays
