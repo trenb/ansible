@@ -104,9 +104,6 @@
   - name: change hostname
     lineinfile: dest=/etc/hostname regexp=^.* line={{ name }}
 
-  - name: change 127.0.1.1 to match hostname
-    lineinfile: dest=/etc/hosts regexp=^127\.0\.1\.1 line="127.0.1.1 {{ name }}"
-
   - name: transfer script to update hosts file
     template: src=update_hosts.drbd.j2 dest=/tmp/update_hosts.sh mode=0755 
 
