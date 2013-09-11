@@ -1,0 +1,124 @@
+# Config file for collectd(1).
+#
+# Some plugins need additional configuration and are disabled by default.
+# Please read collectd.conf(5) for details.
+#
+# You should also read /usr/share/doc/collectd-core/README.Debian.plugins
+# before enabling any more plugins.
+
+#Hostname "localhost"
+FQDNLookup true
+#BaseDir "/var/lib/collectd"
+#PluginDir "/usr/lib/collectd"
+#TypesDB "/usr/share/collectd/types.db" "/etc/collectd/my_types.db"
+#Interval 10
+#Timeout 2
+#ReadThreads 5
+
+LoadPlugin syslog
+
+<Plugin syslog>
+	LogLevel info
+</Plugin>
+
+LoadPlugin cpu
+LoadPlugin df
+LoadPlugin disk
+LoadPlugin load
+LoadPlugin memory
+LoadPlugin mysql
+LoadPlugin processes
+LoadPlugin write_graphite
+
+<Plugin df>
+#	Device "/dev/sda1"
+#	Device "192.168.0.2:/mnt/nfs"
+#	MountPoint "/home"
+	FSType "ext4"
+#	IgnoreSelected false
+#	ReportByDevice false
+#	ReportReserved false
+#	ReportInodes false
+</Plugin>
+
+<Plugin disk>
+	Disk "/{{ disk_prefix }}[abc]/"
+#	Disk "/sda[23]/"
+#	IgnoreSelected false
+</Plugin>
+
+<Plugin mysql>
+	<Database localhost>
+		Host "localhost"
+		User "{{ mysql_user }}"
+		Password "{{ mysql_password }}"
+#		MasterStats true
+	</Database>
+</Plugin>
+
+#<Plugin postgresql>
+#	<Query magic>
+#		Statement "SELECT magic FROM wizard WHERE host = $1;"
+#		Param hostname
+#
+#		<Result>
+#			Type gauge
+#			InstancePrefix "magic"
+#			ValuesFrom "magic"
+#		</Result>
+#	</Query>
+#
+#	<Query rt36_tickets>
+#		Statement "SELECT COUNT(type) AS count, type \
+#		                  FROM (SELECT CASE \
+#		                               WHEN resolved = 'epoch' THEN 'open' \
+#		                               ELSE 'resolved' END AS type \
+#		                               FROM tickets) type \
+#		                  GROUP BY type;"
+#
+#		<Result>
+#			Type counter
+#			InstancePrefix "rt36_tickets"
+#			InstancesFrom "type"
+#			ValuesFrom "count"
+#		</Result>
+#	</Query>
+#
+#	<Database foo>
+#		Host "hostname"
+#		Port 5432
+#		User "username"
+#		Password "secret"
+#
+#		SSLMode "prefer"
+#		KRBSrvName "kerberos_service_name"
+#
+#		Query magic
+#	</Database>
+#
+#	<Database bar>
+#		Interval 60
+#		Service "service_name"
+#
+#		Query backend # predefined
+#		Query rt36_tickets
+#	</Database>
+#</Plugin>
+
+<Plugin processes>
+	Process "java"
+	Process "mysqld"
+#	ProcessMatch "foobar" "/usr/bin/perl foobar\\.pl.*"
+</Plugin>
+
+<Plugin write_graphite>
+	<Carbon>
+		Host "localhost"
+		Port "2003"
+#		Prefix "collectd"
+#		Postfix "collectd"
+		StoreRates true
+		AlwaysAppendDS true
+#		EscapeCharacter "_"
+	</Carbon>
+</Plugin>
