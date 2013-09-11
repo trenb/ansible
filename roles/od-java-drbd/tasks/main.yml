@@ -1,0 +1,19 @@
+---
+  - name: ensure /indicee/java exists
+    file: state=directory path=/indicee/java 
+
+  - name: copy over jdk-6u31-linux-x64.bin
+    get_url: url=http://bastion.symmetrics.local/java/jdk-6u31-linux-x64.bin dest=/indicee/java/jdk-6u31-linux-x64.bin mode=0750 force=yes
+    when_string: '"${name}" in "${primary_host}"'
+
+  - name: copy over install_java.sh
+    get_url: url=http://bastion.symmetrics.local/java/install_java.sh dest=/tmp/install_java.sh mode=0750 force=yes
+    when_string: '"${name}" in "${primary_host}"'
+
+  - name: install jdk-6u31-linux-x64.bin
+    command: /tmp/install_java.sh creates=/indicee/java/jdk1.6.0_31 chdir=/indicee/java
+    when_string: '"${name}" in "${primary_host}"'
+
+  - name: create symlink for jdk
+    file: src=/indicee/java/jdk1.6.0_31 dest=/indicee/java/jdk state=link
+    when_string: '"${name}" in "${primary_host}"'
