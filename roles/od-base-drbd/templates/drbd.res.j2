@@ -15,10 +15,10 @@ resource drbd {
      syncer {
           csums-alg crc32c;
           verify-alg crc32c;
+          al-extents 3389;
      }
      disk {
           on-io-error call-local-io-error;
-          al-extents 3389;
      }
      meta-disk internal;
      device /dev/drbd0;
