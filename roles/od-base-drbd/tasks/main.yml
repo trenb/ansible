@@ -145,15 +145,15 @@
 
   - name: initiate the initial synchronization on the primary host only
     shell: drbdadm -- --overwrite-data-of-peer primary drbd
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: format drbd
     command: mkfs.ext4 -Ldrbd -m0 /dev/drbd0
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: tune drbd file system
     command: tune2fs -c 0 -i 0 /dev/drbd0
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: install heartbeat
     apt: pkg=heartbeat state=present
@@ -175,8 +175,8 @@
 
   - name: ensure /indicee/postgresql-data exists
     file: path=/indicee/postgresql-data state=directory
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: ensure /indicee/bin exists
     file: path=/indicee/bin state=directory
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'

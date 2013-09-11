@@ -1,42 +1,42 @@
 ---
   - name: retrieve jboss 7.1.1
     get_url: url=http://bastion.symmetrics.local/jboss/jboss-as-7.1.1.Final.tar.gz dest=/indicee force=yes
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: extract jboss 7.1.1
     command: tar -zxf jboss-as-7.1.1.Final.tar.gz chdir=/indicee creates=/indicee/jboss
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: move jboss install to /indicee/jboss
     command: mv jboss-as-7.1.1.Final jboss chdir=/indicee creates=/indicee/jboss
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: ensure /indicee/jboss/modules/com/mysql/main exists
     file: path=/indicee/jboss/modules/com/mysql/main state=directory
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: copy mysqlconnector over
     get_url: url=http://bastion.symmetrics.local/jboss/mysql-connector-java-5.1.18-bin.jar dest=/indicee/jboss/modules/com/mysql/main force=yes
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: copy mysqlconnector module.xml files over
     get_url: url=http://bastion.symmetrics.local/jboss/module.xml dest=/indicee/jboss/modules/com/mysql/main force=yes
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: copy standalone.sh over
     get_url: url=http://bastion.symmetrics.local/jboss/standalone.sh dest=/indicee/jboss/bin/standalone.sh mode=0755 force=yes
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: copy start_jboss.sh over
     template: src=start_jboss.sh.j2 dest=/indicee/bin/start_jboss.sh mode=0755
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: copy jboss supervisor conf
     get_url: url=http://bastion.symmetrics.local/jboss/jboss.conf dest=/etc/supervisor/conf.d/jboss.conf mode=0644 force=yes
 
   - name: ensure that /indicee/jboss exists on the secondary
     file: path=/indicee/jboss state=directory
-    when_string: '"${host}" in "${secondary_host}"'
+    when_string: '"${name}" in "${secondary_host}"'
 
   - name: symlink /indicee/jboss to /usr/local/jboss7
     file: src=/indicee/jboss dest=/usr/local/jboss7 state=link

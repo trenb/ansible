@@ -10,7 +10,7 @@
 
   - name: setup policy-rc.d to ensure scripts are not run on secondary node
     get_url: url=http://bastion.symmetrics.local/base/policy-rc.d dest=/usr/sbin/policy-rc.d mode=0755 force=yes
-    when_string: '"${host}" in "${secondary_host}"'    
+    when_string: '"${name}" in "${secondary_host}"'    
 
   - name: install libdbd-mysql-perl
     apt: pkg=libdbd-mysql-perl state=present
@@ -53,4 +53,4 @@
 
   - name: remove policy-rc.d on secondary host
     shell: rm -f /usr/sbin/policy-rc.d
-    when_string: '"${host}" in "${secondary_host}"'
+    when_string: '"${name}" in "${secondary_host}"'

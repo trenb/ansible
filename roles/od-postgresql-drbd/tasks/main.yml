@@ -10,7 +10,7 @@
 
   - name: setup policy-rc.d to ensure scripts are not run on secondary node
     get_url: url=http://bastion.symmetrics.local/base/policy-rc.d dest=/usr/sbin/policy-rc.d mode=0755 force=yes
-    when_string: '"${host}" in "${secondary_host}"'
+    when_string: '"${name}" in "${secondary_host}"'
 
   - name: install postgresql-9.2
     apt: pkg=postgresql-9.2 state=present
@@ -44,15 +44,15 @@
     
   - name: move /var/lib/postgresql/9.2/main to /indicee/postgresql-data/9.2/main
     command: mv /var/lib/postgresql/9.2/main /indicee/postgresql-data/9.2/main creates=/indicee/postgresql-data/9.2/main
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: start postgresql
     command: service postgresql start
-    when_string: '"${host}" in "${primary_host}"'
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: remove postgresql from init
     shell: update-rc.d -f postgresql remove
 
   - name: remove policy-rc.d on secondary host
     shell: rm -f /usr/sbin/policy-rc.d
-    when_string: '"${host}" in "${secondary_host}"'
+    when_string: '"${name}" in "${secondary_host}"'
