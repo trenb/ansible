@@ -140,6 +140,9 @@
   - name: load the drbd module
     command: modprobe drbd
 
+  - name: create the initial metadata on both sides
+    command: drbdadm create-md drbd
+
   - name: bring up the drbd resource
     command: drbdadm up drbd
 
