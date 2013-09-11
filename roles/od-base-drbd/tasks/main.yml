@@ -155,23 +155,9 @@
     command: tune2fs -c 0 -i 0 /dev/drbd0
     when_string: '"${name}" in "${primary_host}"'
 
-  - name: install heartbeat
-    apt: pkg=heartbeat state=present
-
-  - name: transfer over ha.cf
-    template: src=ha.cf.j2 dest=/etc/ha.d/ha.cf mode=0644
-
-  - name: transfer over authkeys
-    get_url: url=http://bastion.symmetrics.local/heartbeat/authkeys dest=/etc/ha.d/authkeys mode=0600 force=yes
-
-  - name: transfer over first stage haresources
-    template: src=haresources.j2 dest=/etc/ha.d/haresources mode=0644 force=yes
-
-  - name: start heartbeat
-    command: service heartbeat start
-
-  - name: sleep for 60 seconds 
-    command: sleep 60
+  - name: mount /dev/drbd0 to /indicee as ext4
+    command: mount -t ext4 -o noatime /dev/drbd0 /indicee 
+    when_string: '"${name}" in "${primary_host}"'
 
   - name: ensure /indicee/postgresql-data exists
     file: path=/indicee/postgresql-data state=directory
