@@ -128,6 +128,9 @@
   - name: install drbd
     command: dpkg -i /tmp/drbd8-utils_8.3.11-0_amd64.deb creates=/etc/drbd.d/global_common.conf
 
+  - name: transfer over update init script for drbd8
+    get_url: url=http://bastion.symmetrics.local/drbd8/drbd.init dest=/etc/init.d/drbd mode=0755 force=yes
+
   - name: transfer over global_common.conf
     get_url: url=http://bastion.symmetrics.local/drbd8/global_common.conf dest=/etc/drbd.d/global_common.conf mode=0644 force=yes
 
