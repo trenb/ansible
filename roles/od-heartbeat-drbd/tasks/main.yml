@@ -1,0 +1,23 @@
+--
+  - name: stop postgresql
+    command: service postgresql stop
+    when_string: '"${name}" in "${primary_host}"'
+
+  - name: stop mysql
+    command: service mysql stop
+    when_string: '"${name}" in "${primary_host}"'
+
+  - name: install heartbeat
+    apt: pkg=heartbeat state=present
+
+  - name: transfer over ha.cf
+    template: src=ha.cf.j2 dest=/etc/ha.d/ha.cf mode=0644
+
+  - name: transfer over authkeys
+    get_url: url=http://bastion.symmetrics.local/heartbeat/authkeys dest=/etc/ha.d/authkeys mode=0600 force=yes
+
+  - name: transfer over haresources 
+    template: src=haresources.j2 dest=/etc/ha.d/haresources mode=0644 force=yes
+
+  - name: start heartbeat
+    command: service heartbeat start
