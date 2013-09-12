@@ -1,4 +1,4 @@
---
+---
   - name: stop postgresql
     command: service postgresql stop
     when_string: '"${name}" in "${primary_host}"'
