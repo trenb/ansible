@@ -7,6 +7,14 @@
     command: service mysql stop
     when_string: '"${name}" in "${primary_host}"'
 
+  - name: unmount /indicee
+    command: umount /indicee
+    when_string: '"${name}" in "${primary_host}"'
+
+  - name: set drbd resource to secondary
+    command: drbdadm secondary drbd
+    when_string: '"${name}" in "${primary_host}"'
+
   - name: install heartbeat
     apt: pkg=heartbeat state=present
 
