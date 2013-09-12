@@ -55,6 +55,10 @@
     shell: service mysql stop
     when_string: '"${name}" in "${secondary_host}"'
 
+  - name: clean up files on secondary node
+    shell: rm -fr /indicee/mysql-data/db/*
+    when_string: '"${name}" in "${secondary_host}"'
+
   - name: remove policy-rc.d on secondary host
     shell: rm -f /usr/sbin/policy-rc.d
     when_string: '"${name}" in "${secondary_host}"'
