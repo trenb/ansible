@@ -9,7 +9,7 @@
     apt: update-cache=yes
 
   - name: setup policy-rc.d to ensure scripts are not run on secondary node
-    get_url: url=http://bastion.symmetrics.local/base/policy-rc.d dest=/usr/sbin/policy-rc.d mode=0755 force=yes
+    get_url: url={{ files_url }}/base/policy-rc.d dest=/usr/sbin/policy-rc.d mode=0755 force=yes
     when_string: '"${name}" in "${secondary_host}"'
 
   - name: install postgresql-9.2

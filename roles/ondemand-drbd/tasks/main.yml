@@ -6,7 +6,7 @@
     file: src=/indicee/phoenix dest=/usr/local/synergy state=link
 
   - name: transfer over nVision OnDemand software
-    get_url: url=http://bastion.symmetrics.local/ondemand/ondemand.{{ ondemand_release }}.tgz dest=/tmp/ondemand.{{ ondemand_release }}.tgz mode=0640 force=yes
+    get_url: url={{ files_url }}/ondemand/ondemand.{{ ondemand_release }}.tgz dest=/tmp/ondemand.{{ ondemand_release }}.tgz mode=0640 force=yes
 
   - name: extract package
     command: tar -zxf ondemand.{{ ondemand_release }}.tgz chdir=/tmp creates=/tmp/installer
@@ -27,7 +27,7 @@
     lineinfile: dest=/etc/hosts regexp='^127\.0\.0\.1' line='127.0.0.1 localhost nvision.symmetrics chief.indicee foreman.indicee hornetq1.indicee master.indicee database.indicee staging.dbs.indicee eclipse.dbs.indicee quartz.dbs.indicee cache.dbs.indicee headnode1.indicee secure.indicee worker1.indicee' owner=root group=root mode=0644 state=present
 
   - name: copy install_ondemand.sh
-    get_url: url=http://bastion.symmetrics.local/ondemand/install_ondemand.sh dest=/tmp/installer/install_ondemand.sh mode=0750 force=yes
+    get_url: url={{ files_url }}/ondemand/install_ondemand.sh dest=/tmp/installer/install_ondemand.sh mode=0750 force=yes
     when_string: '"${name}" in "${primary_host}"'
 
   - name: perform the schema upgrade and install the ondemand application
@@ -35,7 +35,7 @@
     when_string: '"${name}" in "${primary_host}"'
 
   - name: copy phantomjs over
-    get_url: url=http://bastion.symmetrics.local/ondemand/phantomjs-1.6.1-indicee.tar.gz dest=/tmp force=yes
+    get_url: url={{ files_url }}/ondemand/phantomjs-1.6.1-indicee.tar.gz dest=/tmp force=yes
 
   - name: extract phantomjs
     command: tar -zxf /tmp/phantomjs-1.6.1-indicee.tar.gz -C /usr/local creates=/usr/local/phantomjs
@@ -55,7 +55,7 @@
       - libQtWebKit.so.4
 
   - name: copy over quartz.properties
-    get_url: url=http://bastion.symmetrics.local/ondemand/quartz.properties dest=/indicee/jboss/quartz.properties force=yes
+    get_url: url={{ files_url }}/ondemand/quartz.properties dest=/indicee/jboss/quartz.properties force=yes
     when_string: '"${name}" in "${primary_host}"'
 
   - name: copy ondemand.cnf to /etc/mysql
@@ -65,4 +65,4 @@
     command: ln -sf /etc/mysql/ondemand.cnf /etc/mysql/debian.cnf
 
   - name: Install cron_cleantmp.sh into cron
-    get_url: url=http://bastion.symmetrics.local/ondemand/cron_cleantmp.sh dest=/etc/cron.daily/cron_cleantmp.sh force=yes mode=0755
+    get_url: url={{ files_url }}/ondemand/cron_cleantmp.sh dest=/etc/cron.daily/cron_cleantmp.sh force=yes mode=0755

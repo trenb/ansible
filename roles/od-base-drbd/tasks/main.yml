@@ -81,19 +81,19 @@
     shell: update-rc.d -f nfs-common remove;service nfs-common stop
 
   - name: send custom kernel to remote server
-    get_url: url=http://bastion.symmetrics.local/base/linux-{{ kernel_version }} dest=/boot/linux-{{ kernel_version }} mode=0644 force=yes
+    get_url: url={{ files_url }}/base/linux-{{ kernel_version }} dest=/boot/linux-{{ kernel_version }} mode=0644 force=yes
 
   - name: send custom kernel initrd to remote server
-    get_url: url=http://bastion.symmetrics.local/base/initrd.img-{{ kernel_version }} dest=/boot/initrd.img-{{ kernel_version }} mode=0644 force=yes
+    get_url: url={{ files_url }}/base/initrd.img-{{ kernel_version }} dest=/boot/initrd.img-{{ kernel_version }} mode=0644 force=yes
 
   - name: send custom kernel modules to remote server
-    get_url: url=http://bastion.symmetrics.local/base/linux-{{ kernel_version }}-modules.tar.bz2 dest=/tmp/linux-{{ kernel_version }}-modules.tar.bz2 mode=0644 force=yes
+    get_url: url={{ files_url }}/base/linux-{{ kernel_version }}-modules.tar.bz2 dest=/tmp/linux-{{ kernel_version }}-modules.tar.bz2 mode=0644 force=yes
 
   - name: send grub.cfg to remote server
     template: src=grub.cfg.j2 dest=/boot/grub/grub.cfg mode=0644
 
   - name: send gptfdisk_0.8.6-1_amd64.deb package to remote server
-    get_url: url=http://bastion.symmetrics.local/base/gptfdisk_0.8.6-1_amd64.deb dest=/tmp/gptfdisk_0.8.6-1_amd64.deb mode=0644 force=yes
+    get_url: url={{ files_url }}/base/gptfdisk_0.8.6-1_amd64.deb dest=/tmp/gptfdisk_0.8.6-1_amd64.deb mode=0644 force=yes
 
   - name: extract kernel moduless
     command: tar -jxf /tmp/linux-{{ kernel_version }}-modules.tar.bz2 -C /lib/modules chdir=/lib/modules creates=/lib/modules/{{ kernel_version }}
@@ -114,7 +114,7 @@
     command: shutdown -r now
 
   - name: wait for machine to come back
-    local_action: wait_for host={{ inventory_hostname }} port=22 delay=15 timeout=300
+    local_action: wait_for host={{ inventory_hostname }} port=22 delay=15 timeout=1200
 
   - name: ensure /indicee exists
     file: path=/indicee state=directory
@@ -123,16 +123,16 @@
     lvol: vg={{ vg }} lv=drbd size={{ drbd_size }}
 
   - name: transfer over the drbd utilities package
-    get_url: url=http://bastion.symmetrics.local/drbd8/drbd8-utils_8.3.11-0_amd64.deb dest=/tmp/drbd8-utils_8.3.11-0_amd64.deb mode=0644 force=yes
+    get_url: url={{ files_url }}/drbd8/drbd8-utils_8.3.11-0_amd64.deb dest=/tmp/drbd8-utils_8.3.11-0_amd64.deb mode=0644 force=yes
 
   - name: install drbd
     command: dpkg -i /tmp/drbd8-utils_8.3.11-0_amd64.deb creates=/etc/drbd.d/global_common.conf
 
   - name: transfer over update init script for drbd8
-    get_url: url=http://bastion.symmetrics.local/drbd8/drbd.init dest=/etc/init.d/drbd mode=0755 force=yes
+    get_url: url={{ files_url }}/drbd8/drbd.init dest=/etc/init.d/drbd mode=0755 force=yes
 
   - name: transfer over global_common.conf
-    get_url: url=http://bastion.symmetrics.local/drbd8/global_common.conf dest=/etc/drbd.d/global_common.conf mode=0644 force=yes
+    get_url: url={{ files_url }}/drbd8/global_common.conf dest=/etc/drbd.d/global_common.conf mode=0644 force=yes
 
   - name: transfer over drbd resource
     template: src=drbd.res.j2 dest=/etc/drbd.d/drbd.res mode=0644

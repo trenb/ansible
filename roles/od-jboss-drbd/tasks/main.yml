@@ -1,6 +1,6 @@
 ---
   - name: retrieve jboss 7.1.1
-    get_url: url=http://bastion.symmetrics.local/jboss/jboss-as-7.1.1.Final.tar.gz dest=/indicee force=yes
+    get_url: url={{ files_url }}/jboss/jboss-as-7.1.1.Final.tar.gz dest=/indicee force=yes
     when_string: '"${name}" in "${primary_host}"'
 
   - name: extract jboss 7.1.1
@@ -16,15 +16,15 @@
     when_string: '"${name}" in "${primary_host}"'
 
   - name: copy mysqlconnector over
-    get_url: url=http://bastion.symmetrics.local/jboss/mysql-connector-java-5.1.18-bin.jar dest=/indicee/jboss/modules/com/mysql/main force=yes
+    get_url: url={{ files_url }}/jboss/mysql-connector-java-5.1.18-bin.jar dest=/indicee/jboss/modules/com/mysql/main force=yes
     when_string: '"${name}" in "${primary_host}"'
 
   - name: copy mysqlconnector module.xml files over
-    get_url: url=http://bastion.symmetrics.local/jboss/module.xml dest=/indicee/jboss/modules/com/mysql/main force=yes
+    get_url: url={{ files_url }}/jboss/module.xml dest=/indicee/jboss/modules/com/mysql/main force=yes
     when_string: '"${name}" in "${primary_host}"'
 
   - name: copy standalone.sh over
-    get_url: url=http://bastion.symmetrics.local/jboss/standalone.sh dest=/indicee/jboss/bin/standalone.sh mode=0755 force=yes
+    get_url: url={{ files_url }}/jboss/standalone.sh dest=/indicee/jboss/bin/standalone.sh mode=0755 force=yes
     when_string: '"${name}" in "${primary_host}"'
 
   - name: copy start_jboss.sh over
@@ -32,7 +32,7 @@
     when_string: '"${name}" in "${primary_host}"'
 
   - name: copy jboss supervisor conf
-    get_url: url=http://bastion.symmetrics.local/jboss/jboss.conf dest=/etc/supervisor/conf.d/jboss.conf mode=0644 force=yes
+    get_url: url={{ files_url }}/jboss/jboss.conf dest=/etc/supervisor/conf.d/jboss.conf mode=0644 force=yes
 
   - name: ensure that /indicee/jboss exists on the secondary
     file: path=/indicee/jboss state=directory

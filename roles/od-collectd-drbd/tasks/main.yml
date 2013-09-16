@@ -1,6 +1,6 @@
 ---
   - name: copy add_squeeze_backports_repo
-    get_url: url=http://bastion.symmetrics.local/collectd/add_squeeze_backports_repo dest=/tmp/add_squeeze_backports_repo mode=0755 force=yes
+    get_url: url={{ files_url }}/collectd/add_squeeze_backports_repo dest=/tmp/add_squeeze_backports_repo mode=0755 force=yes
 
   - name: add squeeze_backports
     command: /tmp/add_squeeze_backports_repo
@@ -18,4 +18,4 @@
     template: src=collectd.conf.j2 dest=/etc/collectd/collectd.conf mode=0644
 
   - name: install collectd supervisor conf
-    get_url: url=http://bastion.symmetrics.local/collectd/collectd.conf dest=/etc/supervisor/conf.d/collectd.conf mode=0644 force=yes
+    get_url: url={{ files_url }}/collectd/collectd.conf dest=/etc/supervisor/conf.d/collectd.conf mode=0644 force=yes
