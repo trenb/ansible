@@ -1,0 +1,122 @@
+---
+  - name: installing base packages
+    yum: name={{ item }} state=present
+    with_items:
+      - bpg-sans-fonts
+      - bpg-serif-fonts
+      - bzip2
+      - cjkuni-fonts-common
+      - cjkuni-ukai-fonts
+      - cjkuni-uming-fonts
+      - curl
+      - dbus
+      - dejavu-fonts-common
+      - dejavu-sans-mono-fonts
+      - dejavu-sans-fonts
+      - dejavu-serif-fonts
+      - fontpackages-tools
+      - gawk
+      - git
+      - mailx
+      - ImageMagick
+      - iotop
+      - libaio-devel
+      - liberation-fonts-common
+      - lohit-bengali-fonts
+      - lohit-devanagari-fonts
+      - lohit-gujarati-fonts
+      - lohit-kannada-fonts
+      - lohit-malayalam-fonts
+      - lohit-oriya-fonts
+      - lohit-punjabi-fonts
+      - lohit-tamil-fonts
+      - lohit-telugu-fonts
+      - man
+      - perl-DBI
+      - libicu-devel
+      - perl-NetAddr-IP 
+      - perl-SNMP_Session
+      - nc
+      - ntp
+      - python-configobj
+      - openssh-clients
+      - tcpdump
+      - unzip
+      - vim-minimal
+      - zip
+
+  - name: send custom kernel to remote server
+    get_url: url={{ files_url }}/centos/base/linux-{{ kernel_version }} dest=/boot/linux-{{ kernel_version }} mode=0644 force=yes
+
+  - name: send custom kernel initrd to remote server
+    get_url: url={{ files_url }}/centos/base/initramfs-{{ kernel_version }}.img dest=/boot/initramfs-{{ kernel_version }}.img mode=0644 force=yes
+
+  - name: send custom kernel modules to remote server
+    get_url: url={{ files_url }}/centos/base/linux-{{ kernel_version }}-modules.tar.bz2 dest=/tmp/linux-{{ kernel_version }}-modules.tar.bz2 mode=0644 force=yes
+
+  - name: send grub.conf to remote server
+    template: src=grub.conf.j2 dest=/boot/grub/grub.conf mode=0644
+
+  - name: send zfs-util package to remote server
+    get_url: url={{ files_url }}/centos/base/zfs-0.6.2-1.el6.x86_64.rpm dest=/tmp/zfs-0.6.2-1.el6.x86_64.rpm mode=0644 force=yes
+
+  - name: send gdisk-0.8.8-1.el6.x86_64.rpm package to remote server
+    get_url: url={{ files_url }}/centos/base/gdisk-0.8.8-1.el6.x86_64.rpm dest=/tmp/gdisk-0.8.8-1.el6.x86_64.rpm mode=0644 force=yes
+
+  - name: extract kernel moduless
+    command: tar -jxf /tmp/linux-{{ kernel_version }}-modules.tar.bz2 -C /lib/modules chdir=/lib/modules creates=/lib/modules/{{ kernel_version }}
+
+  - name: install zfs-util package
+    command: rpm -i --nodeps /tmp/zfs-0.6.2-1.el6.x86_64.rpm creates=/etc/init.d/zfs 
+
+  - name: install gptfdisk package
+    command: rpm -i /tmp/gdisk-0.8.8-1.el6.x86_64.rpm creates=/usr/sbin/sgdisk
+
+  - name: change hostname
+    lineinfile: dest=/etc/sysconfig/network regexp=^HOSTNAME=.* line=HOSTNAME={{ name }}
+
+  - name: change 127.0.1.1 to match hostname
+    lineinfile: dest=/etc/hosts regexp=^127\.0\.1\.1 line="127.0.1.1 {{ name }}"
+  
+  - name: reboot remote node to pick up new kernel
+    command: shutdown -r now
+
+  - name: wait for machine to come back
+    local_action: wait_for host={{ inventory_hostname }} port=22 delay=15 timeout=300
+
+  - name: ensure /indicee exists
+    file: path=/indicee state=directory
+
+  - name: create lvm slice for zfs pool
+    lvol: vg={{ vg }} lv=zfs size={{ zfs_size }}
+
+  - name: create zfs pool on lvm
+    command: zpool create -f zfs /dev/mapper/{{ vg }}-zfs creates=/zfs
+
+  - name: create /indicee/log file system with compression
+    zfs: name=zfs/log compression=on atime=off mountpoint=/indicee/log state=present
+
+  - name: ensure zfs added to startup
+    command: chkconfig zfs on
+
+  - name: create logical volume for staging db
+    lvol: vg={{ vg }} lv={{ staging_lv }} size={{ staging_mount_size }}
+
+  - name: check if the staging db file system is mounted
+    shell: grep {{ staging_lv }} /proc/mounts
+    register: filesystem
+    ignore_errors: True
+
+  - name: format staging db lv as ext4
+    shell: mkfs.ext4 -L {{ staging_mount }} -m 0 /dev/mapper/{{ vg }}-{{ staging_lv }}
+    when_failed: $filesystem
+
+  - name: ensure /indicee/{{ staging_mount }} exists
+    file: path=/indicee/{{ staging_mount }} state=directory
+
+  - name: mount staging db file system
+    mount: name=/indicee/{{ staging_mount }} src='LABEL={{ staging_mount }}' fstype=ext4 opts='noatime' state=mounted
+    when_failed: $filesystem
+
+  - name: ensure /indicee/bin exists
+    file: path=/indicee/bin state=directory

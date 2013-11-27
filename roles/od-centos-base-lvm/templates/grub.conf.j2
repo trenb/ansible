@@ -1,0 +1,8 @@
+default=0
+timeout=0
+splashimage=(hd0,0)/grub/splash.xpm.gz
+hiddenmenu
+title Symmetrics nVision OnDemand, with Linux {{ kernel_version }}
+	root (hd0,0)
+	kernel /linux-{{ kernel_version }} ro root=/dev/mapper/rootvg-lvslash rd_NO_LUKS LANG=en_US.UTF-8 rd_LVM_LV=rootvg/lvslash rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM rhgb quiet
+	initrd /initramfs-{{ kernel_version }}.img
