@@ -45,32 +45,17 @@
       - vim-minimal
       - zip
 
-  - name: send custom kernel to remote server
-    get_url: url={{ files_url }}/centos/base/linux-{{ kernel_version }} dest=/boot/linux-{{ kernel_version }} mode=0644 force=yes
+  - name: install symmetrics repo
+    yum: name={{ files_url }}/centos/base/symmetrics-repo-1.0-1.x86_64.rpm state=present
 
-  - name: send custom kernel initrd to remote server
-    get_url: url={{ files_url }}/centos/base/initramfs-{{ kernel_version }}.img dest=/boot/initramfs-{{ kernel_version }}.img mode=0644 force=yes
+  - name: install custom kernel
+    yum: name=symmetrics-kernel state=present
+    
+  - name: install zfs utilities
+    yum: name=zfs state=present
 
-  - name: send custom kernel modules to remote server
-    get_url: url={{ files_url }}/centos/base/linux-{{ kernel_version }}-modules.tar.bz2 dest=/tmp/linux-{{ kernel_version }}-modules.tar.bz2 mode=0644 force=yes
-
-  - name: send grub.conf to remote server
-    template: src=grub.conf.j2 dest=/boot/grub/grub.conf mode=0644
-
-  - name: send zfs-util package to remote server
-    get_url: url={{ files_url }}/centos/base/zfs-0.6.2-1.el6.x86_64.rpm dest=/tmp/zfs-0.6.2-1.el6.x86_64.rpm mode=0644 force=yes
-
-  - name: send gdisk-0.8.8-1.el6.x86_64.rpm package to remote server
-    get_url: url={{ files_url }}/centos/base/gdisk-0.8.8-1.el6.x86_64.rpm dest=/tmp/gdisk-0.8.8-1.el6.x86_64.rpm mode=0644 force=yes
-
-  - name: extract kernel moduless
-    command: tar -jxf /tmp/linux-{{ kernel_version }}-modules.tar.bz2 -C /lib/modules chdir=/lib/modules creates=/lib/modules/{{ kernel_version }}
-
-  - name: install zfs-util package
-    command: rpm -i --nodeps /tmp/zfs-0.6.2-1.el6.x86_64.rpm creates=/etc/init.d/zfs 
-
-  - name: install gptfdisk package
-    command: rpm -i /tmp/gdisk-0.8.8-1.el6.x86_64.rpm creates=/usr/sbin/sgdisk
+  - name: install gpt fdisk utilities
+    yum: name=gdisk state=present
 
   - name: change hostname
     lineinfile: dest=/etc/sysconfig/network regexp=^HOSTNAME=.* line=HOSTNAME={{ name }}
@@ -109,14 +94,14 @@
 
   - name: format staging db lv as ext4
     shell: mkfs.ext4 -L {{ staging_mount }} -m 0 /dev/mapper/{{ vg }}-{{ staging_lv }}
-    when_failed: $filesystem
+    when: filesystem|failed
 
   - name: ensure /indicee/{{ staging_mount }} exists
     file: path=/indicee/{{ staging_mount }} state=directory
 
   - name: mount staging db file system
     mount: name=/indicee/{{ staging_mount }} src='LABEL={{ staging_mount }}' fstype=ext4 opts='noatime' state=mounted
-    when_failed: $filesystem
+    when: filesystem|failed
 
   - name: ensure /indicee/bin exists
     file: path=/indicee/bin state=directory
