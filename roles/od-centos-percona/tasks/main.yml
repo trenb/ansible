@@ -1,0 +1,45 @@
+---
+  - name: install percona repo
+    yum: name=http://www.percona.com/downloads/percona-release/percona-release-0.0-1.x86_64.rpm state=present
+
+  - name: install perl-DBD-MySQL
+    yum: name=perl-DBD-MySQL state=present
+
+#  - name: install libmysqlclient18-dev
+#    apt: pkg=libmysqlclient18-dev state=present
+
+#  - name: install percona-xtrabackup
+#    apt: pkg=percona-xtrabackup state=present
+
+  - name: install Percona-Server-shared-55
+    yum: name=Percona-Server-shared-55 state=present
+
+  - name: install Percona-Server-client-55
+    yum: name=Percona-Server-client-55 state=present
+
+  - name: ensure /etc/mysql exists
+    file: path=/etc/mysql state=directory
+  
+  - name: install the my.cnf
+    template: src=my.cnf.j2 dest=/etc/mysql/my.cnf mode=0644
+
+  - name: link /etc/mysql/my.cnf to /etc/my.cnf
+    file: src=/etc/mysql/my.cnf dest=/etc/my.cnf state=link
+
+  - name: add mysql group
+    group: name=mysql gid=115 state=present
+
+  - name: add mysql user
+    user: name=mysql group=mysql uid=110 shell=/bin/false home=/indicee/mysql-data state=present
+
+  - name: ensure /indicee/mysql-data exists
+    file: state=directory path=/indicee/mysql-data owner=mysql group=mysql mode=2770
+
+  - name: ensure percona db data directory exists
+    file: state=directory path=/indicee/mysql-data/db owner=mysql group=mysql mode=2770
+
+  - name: ensure percona db log directory exists
+    file: state=directory path=/indicee/mysql-data/log owner=mysql group=mysql mode=2770
+    
+  - name: install Percona-Server-server-55
+    yum: name=Percona-Server-server-55 state=present
