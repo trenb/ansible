@@ -42,3 +42,5 @@
   - name: install the pg_hba.conf
     template: src=pg_hba.conf.j2 dest=/indicee/postgresql-data/9.2/data/pg_hba.conf mode=0644 owner=postgres group=postgres mode=0644
 
+  - name: restart postgresql-9.2
+    command: service postgesql-9.2 restart
