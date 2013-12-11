@@ -5,12 +5,6 @@
   - name: install perl-DBD-MySQL
     yum: name=perl-DBD-MySQL state=present
 
-#  - name: install libmysqlclient18-dev
-#    apt: pkg=libmysqlclient18-dev state=present
-
-#  - name: install percona-xtrabackup
-#    apt: pkg=percona-xtrabackup state=present
-
   - name: install Percona-Server-shared-55
     yum: name=Percona-Server-shared-55 state=present
 
@@ -43,3 +37,6 @@
     
   - name: install Percona-Server-server-55
     yum: name=Percona-Server-server-55 state=present
+
+  - name: ensure Percona Server is running
+    command: service mysql restart
