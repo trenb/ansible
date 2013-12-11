@@ -1,9 +1,9 @@
 ---
   - name: start postgresql
-    action: service name=postgresql state=started enabled=yes
+    action: service name=postgresql-9.2 state=started enabled=yes
 
   - name: restart postgresql
-    action: service name=postgresql state=restarted enabled=yes
+    action: service name=postgresql-9.2 state=restarted enabled=yes
 
   - name: stop postgresql
-    action: service name=postgresql state=stopped enabled=yes
+    action: service name=postgresql-9.2 state=stopped enabled=yes
