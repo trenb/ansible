@@ -25,10 +25,10 @@
     file: state=directory path=/indicee/postgresql-data/log owner=postgres group=postgres mode=2770
 
   - name: ensure /indicee/postgresql-data/9.2/data exists
-    file: state=directory path=/indicee/postgresql-data/9.2/data owner=postgres group=postgres mode=2770
+    file: state=directory path=/indicee/postgresql-data/9.2/data owner=postgres group=postgres mode=2700
 
   - name: ensure /indicee/postgresql-data/9.2/backup exists
-    file: state=directory path=/indicee/postgresql-data/9.2/backups owner=postgres group=postgres mode=2770
+    file: state=directory path=/indicee/postgresql-data/9.2/backups owner=postgres group=postgres mode=2700
 
   - name: install postgresql-9.2 init script
     template: src=postgresql-9.2.init.j2 dest=/etc/init.d/postgresql-9.2 mode=0755
@@ -37,10 +37,10 @@
     command: service postgresql-9.2 initdb creates=/indicee/postgresql-data/9.2/data/PG_VERSION
   
   - name: install the postgresql.conf
-    template: src=postgresql.conf.j2 dest=/indicee/postgresql-data/9.2/data/postgresql.conf mode=0644 owner=postgres group=postgres mode=0644
+    template: src=postgresql.conf.j2 dest=/indicee/postgresql-data/9.2/data/postgresql.conf mode=0640 owner=postgres group=postgres
 
   - name: install the pg_hba.conf
-    template: src=pg_hba.conf.j2 dest=/indicee/postgresql-data/9.2/data/pg_hba.conf mode=0644 owner=postgres group=postgres mode=0644
+    template: src=pg_hba.conf.j2 dest=/indicee/postgresql-data/9.2/data/pg_hba.conf mode=0640 owner=postgres group=postgres
 
   - name: restart postgresql-9.2
-    command: service postgesql-9.2 restart
+    command: service postgresql-9.2 restart
