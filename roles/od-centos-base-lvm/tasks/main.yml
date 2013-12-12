@@ -63,6 +63,9 @@
   - name: change 127.0.1.1 to match hostname
     lineinfile: dest=/etc/hosts regexp=^127\.0\.1\.1 line="127.0.1.1 {{ name }}"
   
+  - name: mount tmpfs as /tmp
+    mount: name=/tmp src='tmpfs' fstype=tmpfs opts='size=2048m' state=mounted
+
   - name: reboot remote node to pick up new kernel
     command: shutdown -r now
 
