@@ -66,7 +66,7 @@
     get_url: url={{ files_url }}/centos/ondemand/cron_cleantmp.sh dest=/indicee/bin/cron_cleantmp.sh force=yes mode=0755
 
   - name: add cronjob for cron_cleantmp.sh to run daily at 5am
-    cron: name="clean tmp" hour="5" job="/indicee/bin/cron_cleantmp.sh"
+    cron: name="clean tmp" hour="5" minute="0" job="/indicee/bin/cron_cleantmp.sh"
 
   - name: ensure that jboss service is started
     command: supervisorctl reload
