@@ -1,0 +1,72 @@
+---
+  - name: ensure that /indicee/phoenix exists
+    file: path=/indicee/phoenix state=directory
+  
+  - name: create /indicee/phoenix/repository
+    zfs: name=zfs/repository compression=on atime=off mountpoint=/indicee/phoenix/repository state=present
+
+  - name: ensure that /indicee/phoenix is symlinked to /usr/local/synergy
+    file: src=/indicee/phoenix dest=/usr/local/synergy state=link
+
+  - name: transfer over nVision OnDemand software
+    get_url: url={{ files_url }}/centos/ondemand/ondemand.{{ ondemand_release }}.tgz dest=/tmp/ondemand.{{ ondemand_release }}.tgz mode=0640 force=yes
+
+  - name: extract package
+    command: tar -zxf ondemand.{{ ondemand_release }}.tgz chdir=/tmp creates=/tmp/installer
+
+  - name: copy install_schema.sh
+    template: src=install_schema.sh.j2 dest=/tmp/installer/install_schema.sh mode=0750
+
+  - name: install the ondemand schema
+    command: /tmp/installer/install_schema.sh creates=/indicess/mysql-data/db/eclipse_app chdir=/tmp/installer
+
+  - name: stop jboss
+    shell: supervisorctl stop jboss;killall java 
+    ignore_errors: True
+
+  - name: ensure the hosts file has the proper entries
+    lineinfile: dest=/etc/hosts regexp='^127\.0\.0\.1' line='127.0.0.1 localhost nvision.symmetrics chief.indicee foreman.indicee hornetq1.indicee master.indicee database.indicee staging.dbs.indicee eclipse.dbs.indicee quartz.dbs.indicee cache.dbs.indicee headnode1.indicee secure.indicee worker1.indicee' owner=root group=root mode=0644 state=present
+
+  - name: copy install_ondemand.sh
+    get_url: url={{ files_url }}/centos/ondemand/install_ondemand.sh dest=/tmp/installer/install_ondemand.sh mode=0750 force=yes
+
+  - name: perform the schema upgrade and install the ondemand application
+    command: /tmp/installer/install_ondemand.sh chdir=/tmp/installer creates=/indicee/jboss/standalone/deployments/synergy.ear
+
+  - name: install phantomjs
+    yum: name=phantomjs-indicee-1.6.1-1 state=present
+
+  - name: link /usr/local/phantomjs/bin/phantomjs to /usr/bin/phantomjs
+    file: src=/usr/local/phantomjs/bin/phantomjs dest=/usr/bin/phantomjs state=link
+
+  - name: link phantomjs libraries to /usr/lib
+    file: src=/usr/local/phantomjs/lib/{{ item }} dest=/usr/lib/{{ item }} state=link
+    with_items:
+      - libQtCore.so.4
+      - libQtGui.so.4
+      - libQtNetwork.so.4
+      - libQtWebKit.so.4
+
+  - name: copy phantomjs.conf to /etc/ld.so.conf.d
+    get_url: url={{ files_url }}/centos/ondemand/phantomjs.conf dest=/etc/ld.so.conf.d/phantomjs.conf force=yes
+
+  - name: run ldconfig
+    command: /sbin/ldconfig
+
+  - name: copy over quartz.properties
+    get_url: url={{ files_url }}/centos/ondemand/quartz.properties dest=/indicee/jboss/quartz.properties force=yes
+
+  - name: copy ondemand.cnf to /etc/mysql
+    command: cp /tmp/installer/ondemand.cnf /etc/mysql/ondemand.cnf creates=/etc/mysql/ondemand.cnf
+
+  - name: symlink ondemand.cnf to debian.cnf
+    command: ln -sf /etc/mysql/ondemand.cnf /etc/mysql/debian.cnf
+
+  - name: Install cron_cleantmp.sh into /indicee/bin
+    get_url: url={{ files_url }}/centos/ondemand/cron_cleantmp.sh dest=/indicee/bin/cron_cleantmp.sh force=yes mode=0755
+
+  - name: add cronjob for cron_cleantmp.sh to run daily at 5am
+    cron: name="clean tmp" hour="5" job="/indicee/bin/cron_cleantmp.sh"
+
+  - name: ensure that jboss service is started
+    command: supervisorctl reload
