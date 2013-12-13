@@ -52,7 +52,7 @@
     file: path=/var/log/supervisor state=directory
 
   - name: ensure /indicee/graphite/whisper/log/webapp exists
-    file: path=/indicee/graphite/whisper/log/webapp state=directory owner=graphite group=graphite
+    file: path=/indicee/graphite/log/webapp state=directory owner=graphite group=graphite
 
   - name: copy local_settings.py to /opt/graphite/webapp/graphite
     get_url: url={{ files_url }}/centos/graphite/local_settings.py dest=/opt/graphite/webapp/graphite/local_settings.py mode=0644 force=yes
