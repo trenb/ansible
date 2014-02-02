@@ -1,0 +1,127 @@
+---
+  - name: installing base packages
+    yum: name={{ item }} state=present
+    with_items:
+      - bpg-sans-fonts
+      - bpg-serif-fonts
+      - bzip2
+      - cjkuni-fonts-common
+      - cjkuni-ukai-fonts
+      - cjkuni-uming-fonts
+      - curl
+      - dbus
+      - dejavu-fonts-common
+      - dejavu-sans-mono-fonts
+      - dejavu-sans-fonts
+      - dejavu-serif-fonts
+      - fontpackages-tools
+      - gawk
+      - git
+      - mailx
+      - ImageMagick
+      - iotop
+      - libaio-devel
+      - liberation-fonts-common
+      - lohit-bengali-fonts
+      - lohit-devanagari-fonts
+      - lohit-gujarati-fonts
+      - lohit-kannada-fonts
+      - lohit-malayalam-fonts
+      - lohit-oriya-fonts
+      - lohit-punjabi-fonts
+      - lohit-tamil-fonts
+      - lohit-telugu-fonts
+      - man
+      - perl-DBI
+      - libicu-devel
+      - perl-NetAddr-IP 
+      - perl-SNMP_Session
+      - nc
+      - ntp
+      - python-configobj
+      - openssh-clients
+      - tcpdump
+      - unzip
+      - vim-minimal
+      - zip
+
+  - name: install symmetrics repo
+    yum: name={{ files_url }}/centos/base/symmetrics-repo-1.0-1.x86_64.rpm state=present
+
+  - name: install custom kernel
+    yum: name=symmetrics-kernel state=present
+    
+  - name: install gpt fdisk utilities
+    yum: name=gdisk state=present
+
+  - name: change hostname
+    lineinfile: dest=/etc/sysconfig/network regexp=^HOSTNAME=.* line=HOSTNAME={{ name }}
+
+  - name: change 127.0.1.1 to match hostname
+    lineinfile: dest=/etc/hosts regexp=^127\.0\.1\.1 line="127.0.1.1 {{ name }}"
+  
+  - name: mount tmpfs as /tmp
+    mount: name=/tmp src='tmpfs' fstype=tmpfs opts='size=2048m' state=mounted
+
+  - name: transfer script to update hosts file
+    template: src=update_hosts.drbd.j2 dest=/tmp/update_hosts.sh mode=0755
+
+  - name: update the hosts file with primary and secondary host information
+    command: /tmp/update_hosts.sh chdir=/tmp
+
+  - name: reboot remote node to pick up new kernel
+    command: shutdown -r now
+
+  - name: wait for machine to come back
+    local_action: wait_for host={{ inventory_hostname }} port=22 delay=15 timeout=300
+
+  - name: ensure /indicee exists
+    file: path=/indicee state=directory
+
+  - name: create lvm slice for drbd
+    lvol: vg={{ vg }} lv=drbd size={{ drbd_size }}
+
+  - name: install drbd
+    yum: name={{ item }} state=present
+    with_items:
+      - drbd-utils
+      - drbd-heartbeat
+      - drbd-udev
+
+  - name: transfer over global_common.conf
+    get_url: url={{ files_url }}/drbd8/global_common.conf dest=/etc/drbd.d/global_common.conf mode=0644 force=yes
+
+  - name: transfer over drbd resource
+    template: src=drbd.res.j2 dest=/etc/drbd.d/drbd.res mode=0644
+
+  - name: load the drbd module
+    command: modprobe drbd
+
+  - name: create the initial metadata on both sides
+    command: drbdadm -- --force create-md drbd
+
+  - name: bring up the drbd resource
+    command: drbdadm up drbd
+
+  - name: initiate the initial synchronization on the primary host only
+    shell: drbdadm -- --overwrite-data-of-peer primary drbd
+    when: name == "{{ primary_host }}"
+
+  - name: format drbd
+    command: mkfs.ext4 -Ldrbd -m0 /dev/drbd0
+    when: name == "{{ primary_host }}"
+
+  - name: tune drbd file system
+    command: tune2fs -c 0 -i 0 /dev/drbd0
+    when: name == "{{ primary_host }}"
+
+  - name: mount /dev/drbd0 to /indicee as ext4
+    command: mount -t ext4 -o noatime /dev/drbd0 /indicee
+    when: name == "{{ primary_host }}"
+
+  - name: ensure /indicee/postgresql-data exists
+    file: path=/indicee/postgresql-data state=directory
+    when: name == "{{ primary_host }}"
+
+  - name: ensure /indicee/bin exists
+    file: path=/indicee/bin state=directory

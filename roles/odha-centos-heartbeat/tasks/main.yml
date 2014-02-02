@@ -1,0 +1,35 @@
+---
+  - name: stop postgresql-9.2
+    command: service postgresql-9.2 stop
+    when: name == "{{ primary_host }}"
+
+  - name: stop mysql
+    command: service mysql stop
+    when: name == "{{ primary_host }}"
+
+  - name: stop supervisord
+    command: service supervisord stop
+    when: name == "{{ primary_host }}"
+
+  - name: unmount /indicee
+    command: umount /indicee
+    when: name == "{{ primary_host }}"
+
+  - name: set drbd resource to secondary
+    command: drbdadm secondary drbd
+    when: name == "{{ primary_host }}"
+
+  - name: install heartbeat
+    yum: name=heartbeat state=present
+
+  - name: transfer over ha.cf
+    template: src=ha.cf.j2 dest=/etc/ha.d/ha.cf mode=0644
+
+  - name: transfer over authkeys
+    get_url: url={{ files_url }}/heartbeat/authkeys dest=/etc/ha.d/authkeys mode=0600 force=yes
+
+  - name: transfer over haresources 
+    template: src=haresources.j2 dest=/etc/ha.d/haresources mode=0644 force=yes
+
+  - name: start heartbeat
+    command: service heartbeat start

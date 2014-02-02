@@ -1,0 +1,81 @@
+---
+  - name: add epel repo
+    command: rpm -Uhv https://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm creates=/etc/yum.repos.d/epel.repo
+
+  - name: install graphite and supervisor
+    yum: name={{ item }} state=present
+    with_items:
+      - python-carbon-0.9.12-1
+      - python-whisper-0.9.12-1
+      - python-graphite-web-0.9.12-1
+      - python-supervisor-3.0-1
+
+  - name: remove /opt/graphite/storage/whisper and link to /indicee/graphite/whisper
+    shell: rm -fr /opt/graphite/storage/whisper; mkdir -p /indicee/graphite/whisper; ln -s /indicee/graphite/whisper /opt/graphite/storage/whisper creates=/indicee/graphite/whisper
+
+  - name: ensure /etc/supervisor/conf.d exists
+    file: name=/etc/supervisor/conf.d state=directory
+
+  - name: copy supervisord.conf to /etc/supervisor
+    get_url: url={{ files_url }}/centos/graphite/supervisord.conf dest=/etc/supervisord.conf mode=0644 force=yes
+
+  - name: copy supervisord init script to /etc/init.d
+    get_url: url={{ files_url }}/centos/graphite/supervisord dest=/etc/init.d/supervisord mode=0755 force=yes
+
+  - name: copy graphite configuration files
+    get_url: url={{ files_url }}/centos/graphite/{{ item }} dest=/opt/graphite/conf/{{ item }} mode=0644 force=yes
+    with_items:
+      - carbon.conf
+      - dashboard.conf
+      - storage-aggregation.conf
+      - storage-schemas.conf
+
+  - name: add graphite group
+    group: name=graphite gid=82 state=present
+
+  - name: add graphite user
+    user: name=graphite group=graphite uid=82 home=/opt/graphite shell=/bin/bash state=present
+
+  - name: ensure /var/run/gunicorn-graphite exists
+    file: path=/var/run/gunicorn-graphite state=directory owner=graphite group=graphite 
+
+  - name: ensure /var/log/gunicorn-graphite exists
+    file: path=/var/log/gunicorn-graphite state=directory owner=graphite group=graphite
+
+  - name: ensure /var/run/carbon exists
+    file: path=/var/run/carbon state=directory owner=graphite group=graphite
+
+  - name: ensure /var/log/carbon exists
+    file: path=/var/log/carbon state=directory owner=graphite group=graphite
+
+  - name: ensure /var/log/supervisor exists
+    file: path=/var/log/supervisor state=directory
+
+  - name: ensure /indicee/graphite/whisper/log/webapp exists
+    file: path=/indicee/graphite/log/webapp state=directory owner=graphite group=graphite
+
+  - name: copy local_settings.py to /opt/graphite/webapp/graphite
+    get_url: url={{ files_url }}/centos/graphite/local_settings.py dest=/opt/graphite/webapp/graphite/local_settings.py mode=0644 force=yes
+
+  - name: run initial syncdb for the webapp
+    raw: cd /opt/graphite/webapp/graphite; python manage.py syncdb --noinput
+
+  - name: ensuring ownership on /opt/graphite
+    command: chown -R graphite:graphite /opt/graphite
+
+  - name: ensuring ownership on /indicee/graphite
+    command: chown -R graphite:graphite /indicee/graphite
+
+  - name: ensure supervisord is not in init
+    command: chkconfig supervisord off
+
+  - name: stop the supervisor service
+    command: service supervisord stop
+
+  - name: sleep for 5 seconds
+    command: sleep 5
+    when: name == "{{ primary_host }}"
+  
+  - name: start the supervisor service
+    command: service supervisord start
+    when: name == "{{ primary_host }}"

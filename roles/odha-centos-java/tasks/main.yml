@@ -1,0 +1,7 @@
+---
+  - name: install jdk 1.6.0.31
+    yum: name=jdk6-indicee-1.6.0.31-1 state=present
+
+  - name: create symlink for jdk
+    file: src=/indicee/java/jdk1.6.0.31 dest=/indicee/java/jdk state=link
+    when: name == "{{ primary_host }}"

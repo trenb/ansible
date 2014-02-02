@@ -1,0 +1,29 @@
+---
+  - name: install jboss 7.1.1 rpm
+    yum: name=jboss-indicee-7.1.1-1 state=present
+
+  - name: ensure /indicee/jboss/modules/com/mysql/main exists
+    file: path=/indicee/jboss/modules/com/mysql/main state=directory
+    when: name == "{{ primary_host }}"
+
+  - name: copy mysqlconnector over
+    get_url: url={{ files_url }}/centos/jboss/mysql-connector-java-5.1.18-bin.jar dest=/indicee/jboss/modules/com/mysql/main force=yes
+    when: name == "{{ primary_host }}"
+
+  - name: copy mysqlconnector module.xml files over
+    get_url: url={{ files_url }}/centos/jboss/module.xml dest=/indicee/jboss/modules/com/mysql/main force=yes
+    when: name == "{{ primary_host }}"
+
+  - name: copy standalone.sh over
+    get_url: url={{ files_url }}/centos/jboss/standalone.sh dest=/indicee/jboss/bin/standalone.sh mode=0755 force=yes
+    when: name == "{{ primary_host }}"
+
+  - name: copy start_jboss.sh over
+    template: src=start_jboss.sh.j2 dest=/indicee/bin/start_jboss.sh mode=0755
+    when: name == "{{ primary_host }}"
+
+  - name: copy jboss supervisor conf
+    get_url: url={{ files_url }}/centos/jboss/jboss.conf dest=/etc/supervisor/conf.d/jboss.conf mode=0644 force=yes
+
+  - name: symlink /indicee/jboss to /usr/local/jboss7
+    file: src=/indicee/jboss dest=/usr/local/jboss7 state=link
