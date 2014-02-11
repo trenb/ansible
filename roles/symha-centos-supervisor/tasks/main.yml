@@ -1,0 +1,21 @@
+---
+  - name: add epel repo
+    command: rpm -Uhv https://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm creates=/etc/yum.repos.d/epel.repo
+
+  - name: install supervisor
+    yum: name=python-supervisor-3.0-1 state=present
+
+  - name: ensure /etc/supervisor/conf.d exists
+    file: name=/etc/supervisor/conf.d state=directory
+
+  - name: ensure /var/log/supervisor exists
+    file: path=/var/log/supervisor state=directory
+
+  - name: copy supervisord.conf to /etc/supervisor
+    get_url: url={{ files_url }}/symmetrics/supervisor/supervisord.conf dest=/etc/supervisord.conf mode=0644 force=yes
+
+  - name: copy supervisord init script to /etc/init.d
+    get_url: url={{ files_url }}/symmetrics/supervisor/supervisord dest=/etc/init.d/supervisord mode=0755 force=yes
+
+  - name: ensure supervisord not in init.d
+    command: chkconfig supervisord off

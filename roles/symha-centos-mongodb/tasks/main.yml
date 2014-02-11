@@ -1,0 +1,27 @@
+---
+  - name: Installing repo for mongo
+    yum: name=mongodb-repo state=present
+
+  - name: Install mongodb server and utilities
+    yum: name={{ item }} state=present
+    with_items: 
+      - mongo-10gen
+      - mongo-10gen-server
+
+  - name: Ensure mongo directories exist
+    file: path=/home/symmetrics/mongo owner=symmetrics group=symmetrics mode=2770 state=directory
+
+  - name: Ensure mongodb directories exist
+    file: path=/home/symmetrics/mongo/db owner=symmetrics group=symmetrics mode=2770 state=directory
+
+  - name: Ensure mongodb log directory exists
+    file: path=/home/symmetrics/mongo/log owner=symmetrics group=symmetrics mode=2770 state=directory
+
+  - name: put mongod runtime settings
+    template: src=mongod.j2 dest=/etc/sysconfig/mongod owner=symmetrics group=symmetrics mode=0664 
+
+  - name: put mongod configuration settings
+    template: src=mongod.conf.j2 dest=/etc/mongod.conf owner=symmetrics group=symmetrics mode=0664
+
+  - name: ensure mongod removed from init.d
+    command: chkconfig mongod off
