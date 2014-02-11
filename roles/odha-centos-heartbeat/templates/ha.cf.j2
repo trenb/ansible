@@ -3,6 +3,7 @@ nice_failback on
 auto_failback off
 ucast {{ shared_int }} {{ primary_ip }}
 ucast {{ shared_int }} {{ secondary_ip }}
+logfacility local7
 udpport 694
 warntime 5
 deadtime 15
